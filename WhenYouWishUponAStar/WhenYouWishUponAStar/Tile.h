@@ -5,7 +5,7 @@
 
 
 
-class GridMap;
+class World;
 class DrawManager;
 class SpriteManager;
 class Tile 
@@ -20,23 +20,20 @@ public:
 	std::vector<Tile*> GetNeighbours();
 	Vector2<int> GetWorldPos();
 	Vector2<int> GetGridPos();
-	GridMap* m_gridMap;
+	void HandleButtonEvent(SDL_MouseButtonEvent& p_mEv);
+	World* m_world;
 
 
-	void Lock(int p_ID, std::string p_type);
-	void Unlock(int p_ID, std::string p_type);
-	bool Locked(int p_ID, std::string p_type);
 private:
 
 	SDL_Rect m_rect;
 	DrawManager* m_drawManager;
 	SpriteManager* m_spriteManager;
-
-	Sprite* m_sprite;
+	Sprite* m_activeSprite;
+	std::vector<Sprite*> m_sprites;
 	std::vector<Tile*> m_neighbours;
-	int m_gridX, m_gridY;
-	int m_x, m_y;
-	int m_lockedByID; 
-	std::string m_lockedByType;
+	unsigned int m_gridX, m_gridY, m_x, m_y;;
+
+
 };
 

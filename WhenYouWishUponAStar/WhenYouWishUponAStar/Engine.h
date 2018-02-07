@@ -1,7 +1,7 @@
 #pragma once
 class DrawManager;
 class SpriteManager;
-class GridMap;
+class World;
 
 class Engine
 {
@@ -14,7 +14,8 @@ public:
 
 private:
 	void CalculateDelta();
-	bool isRunning();
+	void HandleEvents();
+	bool isRunning;
 	void LockFrameRate(int p_frameCount);
 	float m_delta;
 
@@ -25,7 +26,7 @@ private:
 
 	DrawManager* m_drawManager;
 	SpriteManager* m_spriteManager;
-	GridMap* m_gridMap;
+	World* m_world;
 
 
 };

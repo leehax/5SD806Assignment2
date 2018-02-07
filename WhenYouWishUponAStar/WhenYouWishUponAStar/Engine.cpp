@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include <iostream>
-#include "GridMap.h"
+#include "IGridMap.h"
 #include "ServiceLocator.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
+#include "World.h"
 
 
 Engine::Engine()
@@ -15,7 +16,6 @@ Engine::Engine()
 
 	assert(TTF_Init() == 0 && "TTF_Init FAILED!");	//TTF_Init returns 0 on success
 
-	isRunning();
 }
 
 
@@ -30,23 +30,23 @@ void Engine::Initialise()
 {
 	m_drawManager = new DrawManager();
 	
-	m_gridMap = new GridMap();
+	m_world = new World();
 	
 	m_drawManager->Initialise();
 	m_spriteManager = new SpriteManager(m_drawManager->GetRenderer());
 
 	ServiceLocator<DrawManager>::ProvideService(m_drawManager);
 	ServiceLocator<SpriteManager>::ProvideService(m_spriteManager);
-	ServiceLocator<GridMap>::ProvideService(m_gridMap);
-	m_gridMap->Initialise();
-	
+	ServiceLocator<World>::ProvideService(m_world);
+	m_world->Initialise();
+	isRunning = true;
 }
 
 void Engine::Destroy()
 
 {
-	delete m_gridMap;
-	m_gridMap = nullptr;
+	delete m_world;
+	m_world = nullptr;
 	delete m_spriteManager;
 	m_spriteManager = nullptr;
 	m_drawManager->Destroy();
@@ -57,13 +57,14 @@ void Engine::Destroy()
 
 void Engine::Run()
 {
-	while(isRunning()==true)
+
+	while(isRunning)
 	{
 		m_drawManager->Clear();
 		CalculateDelta();
-
-		m_gridMap->DrawGrid(0, 0, 0, 255);
-		m_gridMap->Update(m_delta);
+		HandleEvents();
+		m_world->DrawGrid(0, 0, 0, 255);
+		m_world->Update(m_delta);
 		
 		m_drawManager->Present();
 	}
@@ -75,18 +76,26 @@ void Engine::CalculateDelta()
 	m_lastTick = SDL_GetTicks();
 }
 
-
-bool Engine::isRunning()
+void Engine::HandleEvents()
 {
 	SDL_Event event;
+	SDL_Point mousePos;
+
 	while (SDL_PollEvent(&event) == 1)
 	{
+		SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
 		if (event.type == SDL_QUIT) {
-			return false;
+			isRunning = false;
+		}
+		else
+		{
+			m_world->HandleEvent(event, mousePos);
 		}
 	}
-	return true;
 }
+
+
 
 void Engine::LockFrameRate(int p_frameCount)
 {
