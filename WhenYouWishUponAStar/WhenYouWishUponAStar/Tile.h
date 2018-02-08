@@ -8,10 +8,13 @@
 class World;
 class DrawManager;
 class SpriteManager;
+
+enum Type{Dirt, Grass, Crater};
+
 class Tile 
 {
 public:
-	Tile(int p_x,  int p_y,  int p_w,  int p_h, int p_gridX, int p_gridY);
+	Tile(int p_x,  int p_y,  int p_w,  int p_h, int p_gridX, int p_gridY, int p_type);
 	~Tile();
 	SDL_Rect* GetRect();
 	void Draw(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a);
@@ -22,10 +25,11 @@ public:
 	Vector2<int> GetGridPos();
 	void HandleButtonEvent(SDL_MouseButtonEvent& p_mEv);
 	World* m_world;
-
+	bool IsBlocked();
 
 private:
-
+	Type m_type;
+	bool m_blocked;
 	SDL_Rect m_rect;
 	DrawManager* m_drawManager;
 	SpriteManager* m_spriteManager;

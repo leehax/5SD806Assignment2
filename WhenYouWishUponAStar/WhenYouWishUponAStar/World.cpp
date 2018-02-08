@@ -27,7 +27,7 @@ void World::Initialise()
 	{
 		for (int y = 0; y < m_rows; y++)
 		{
-			Tile* tile = new Tile(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, x, y);
+			Tile* tile = new Tile(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, x, y, rand()%3);
 			m_tiles[std::make_pair(x, y)] = tile;
 
 		}
