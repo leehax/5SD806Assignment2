@@ -15,7 +15,7 @@ Tile::Tile(int p_x, int p_y, int p_w, int p_h, int p_gridX, int p_gridY, int p_t
 	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
 	m_sprites.push_back(m_spriteManager->CreateSprite("../External/Textures/Spacedirt.png", 0, 0, 32, 32));
 	m_sprites.push_back(m_spriteManager->CreateSprite("../External/Textures/Spacegrass.png", 0, 0, 32, 32));
-	m_sprites.push_back(m_spriteManager->CreateSprite("../External/Textures/Crater.png", 0, 0, 32, 32));
+	m_sprites.push_back(m_spriteManager->CreateSprite("../External/Textures/crater.png", 0, 0, 32, 32));
 
 	m_gridX = p_gridX;
 	m_gridY = p_gridY;
@@ -24,7 +24,7 @@ Tile::Tile(int p_x, int p_y, int p_w, int p_h, int p_gridX, int p_gridY, int p_t
 	m_world = ServiceLocator<World>::GetService();
 	m_type = static_cast<Type>(p_type);
 	m_activeSprite = m_sprites[m_type];
-	m_blocked = (m_type == Crater);
+	m_blocked = (m_type == crater);
 }
 
 Tile::~Tile()
@@ -132,21 +132,21 @@ void Tile::HandleButtonEvent(SDL_MouseButtonEvent& p_mEv)
 	{
 		if (p_mEv.button == SDL_BUTTON_LEFT)
 		{
-			if (m_type == Dirt)
+			if (m_type == dirt)
 			{
-				m_type = Grass;
+				m_type = grass;
 				m_activeSprite = m_sprites[1];
 				m_blocked = false;
 			}
-			else if (m_type == Grass)
+			else if (m_type == grass)
 			{
-				m_type = Crater;
+				m_type = crater;
 				m_activeSprite = m_sprites[2];
 				m_blocked = true;
 			}
-			else if (m_type == Crater)
+			else if (m_type == crater)
 			{
-				m_type = Dirt;
+				m_type = dirt;
 				m_activeSprite = m_sprites[0];
 				m_blocked = false;
 			}

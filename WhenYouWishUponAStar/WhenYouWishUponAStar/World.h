@@ -1,5 +1,8 @@
 #pragma once
 #include "IGridMap.h"
+#include "Spaceship.h"
+#include "GuiButton.h"
+
 class World :
 	public IGridMap
 {
@@ -13,6 +16,7 @@ public:
 	void HandleEvent(SDL_Event& p_ev, SDL_Point p_pos) override;
 private:
 	unsigned int m_columns, m_rows, m_tileSize;
-
+	Spaceship* m_ship;
+	GuiButton* m_gui;
 };
 

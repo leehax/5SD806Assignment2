@@ -7,7 +7,7 @@ namespace Config {
 	static unsigned int ROWS=24;
 	static unsigned int TILE_SIZE=32;
 	static unsigned int WINDOW_WIDTH = COLUMNS*TILE_SIZE;
-	static unsigned int WINDOW_HEIGHT = (ROWS + 1)*TILE_SIZE;
+	static unsigned int WINDOW_HEIGHT = (ROWS + 2)*TILE_SIZE;
 
 }
 

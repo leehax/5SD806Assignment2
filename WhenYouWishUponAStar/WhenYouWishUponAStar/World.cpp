@@ -23,6 +23,8 @@ World::~World()
 
 void World::Initialise()
 {
+	srand(time(NULL));
+
 	for (int x = 0; x < m_columns; x++)
 	{
 		for (int y = 0; y < m_rows; y++)
@@ -32,7 +34,10 @@ void World::Initialise()
 
 		}
 	}
-	srand(time(NULL));
+
+	m_ship = new Spaceship(GetTile(rand()%m_columns,rand()%m_rows)); 
+	m_gui = new GuiButton(Config::WINDOW_WIDTH / 2, Config::WINDOW_HEIGHT - Config::TILE_SIZE, 48, 24, "HELLO");
+	
 }
 
 void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
@@ -41,6 +46,8 @@ void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 	{
 		t.second->Draw(p_r, p_g, p_b, p_a);
 	}
+	m_ship->Draw();
+	m_gui->Draw();
 }
 
 void World::Update(float p_delta)
@@ -71,5 +78,9 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 		{
 			t.second->HandleButtonEvent(p_ev.button);
 		}
+	}
+	if(SDL_PointInRect(&p_pos,m_gui->GetRect()))
+	{
+		m_gui->HandleButtonEvent(p_ev.button);
 	}
 }

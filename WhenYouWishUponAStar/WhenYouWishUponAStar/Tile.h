@@ -9,7 +9,7 @@ class World;
 class DrawManager;
 class SpriteManager;
 
-enum Type{Dirt, Grass, Crater};
+enum Type{dirt, grass, crater};
 
 class Tile 
 {
