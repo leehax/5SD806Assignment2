@@ -19,6 +19,7 @@ void DrawManager::Initialise()
 
 	m_renderer = SDL_CreateRenderer(m_window, -1, SDL_VIDEO_OPENGL);
 	assert(m_renderer != nullptr&&"SDL_CreateRenderer FAILED!");
+	LoadFont(12);
 
 }
 
@@ -29,6 +30,7 @@ void DrawManager::Destroy()
 
 	SDL_DestroyRenderer(m_renderer);
 	m_renderer = nullptr;
+	UnloadFont();
 
 }
 
@@ -63,8 +65,8 @@ void DrawManager::DrawLine(int p_xPos, int p_yPos, int p_xTarget, int p_yTarget)
 
 void DrawManager::DrawText(int p_xPos, int p_Ypos, int p_fontSize, std::string p_text, SDL_Color p_color)
 {
-		if(LoadFont(p_fontSize)){
-		SDL_Surface* surface = TTF_RenderText_Solid(m_font, p_text.c_str(), p_color);
+		if(m_defaultFont){
+		SDL_Surface* surface = TTF_RenderText_Solid(m_defaultFont, p_text.c_str(), p_color);
 		SDL_Rect* rect = new SDL_Rect;
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, surface);
 		if (surface != nullptr)
@@ -80,7 +82,6 @@ void DrawManager::DrawText(int p_xPos, int p_Ypos, int p_fontSize, std::string p
 		delete rect;
 		rect = nullptr;
 		SDL_DestroyTexture(texture);
-		UnloadFont();
 	}
 
 }
@@ -96,20 +97,24 @@ SDL_Window* DrawManager::GetWindow()
 	return m_window;
 }
 
+TTF_Font* DrawManager::GetDefFont()
+{
+	return m_defaultFont;
+}
 
 
 bool DrawManager::LoadFont(const int p_size)
 {
-	m_font= TTF_OpenFont("../External/fonts/VeraMono.ttf", p_size);
+	m_defaultFont = TTF_OpenFont("../External/fonts/VeraMono.ttf", p_size);
 
-	return (m_font != nullptr);
+	return (m_defaultFont != nullptr);
 }
 
 void DrawManager::UnloadFont()
 {
-	if(m_font)
+	if(m_defaultFont)
 	{
-		TTF_CloseFont(m_font);
+		TTF_CloseFont(m_defaultFont);
 	}
 }
 

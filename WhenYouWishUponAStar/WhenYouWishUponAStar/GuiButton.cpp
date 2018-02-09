@@ -2,40 +2,78 @@
 #include "GuiButton.h"
 #include "DrawManager.h"
 #include "ServiceLocator.h"
+#include "Sprite.h"
+#include "SpriteManager.h"
 
 
-GuiButton::GuiButton(int p_x, int p_y, int p_w, int p_h, std::string p_text)
+GuiButton::GuiButton(int p_x, int p_y, std::string p_name, std::string p_spriteFilePath)
 {
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
-	m_rect = { p_x,p_y,p_w,p_h };
-	m_text = p_text;
-	m_color = {255,255,255,255};
+	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
+	m_sprite = m_spriteManager->CreateSprite(p_spriteFilePath, 0, 0, 32, 32);
+	m_name = p_name;
+	int width, height;
+	if(m_sprite!=nullptr)
+	{
+		width = m_sprite->GetClip().w;
+		height = m_sprite->GetClip().h;
+	}
+	m_rect = { p_x,p_y, width, height};
+	
+	std::string p_type;
+	m_color1 = { 0,255,255,255};
+	m_color2 = { 255,255,255,255 };
 }
 
 GuiButton::~GuiButton()
 {
+	m_drawManager = nullptr;
+	m_sprite = nullptr;
+	m_spriteManager = nullptr;
 }
 
 void GuiButton::Draw()
 {
-	m_drawManager->DrawRect(m_rect, m_color.r, m_color.g, m_color.b, m_color.a);
-	m_drawManager->DrawText(m_rect.x, m_rect.y, 12, m_text, m_color);
+	
+	m_drawManager->Draw(m_sprite, m_rect.x, m_rect.y, 1);
+	m_drawManager->DrawRect(m_rect, m_activeColor.r, m_activeColor.g, m_activeColor.b, m_activeColor.a);
+	m_drawManager->DrawText(m_rect.x, m_rect.y+m_rect.h, 12, m_name, m_activeColor);
+
 }
 
-void GuiButton::OnClick()
+void GuiButton::SetActive(bool p_val)
 {
-	
+	m_active = p_val;
+	if(m_active)
+	{
+		m_activeColor = m_color1;
+	}
+	else
+	{
+		m_activeColor = m_color2;
+	}
 }
 
 void GuiButton::HandleButtonEvent(SDL_MouseButtonEvent p_mEv)
 {
 	if(p_mEv.type==SDL_MOUSEBUTTONDOWN&&p_mEv.button==SDL_BUTTON_LEFT)
 	{
-		OnClick();
+		SetActive(!m_active);
 	}
+}
+
+bool GuiButton::IsActive()
+{
+	return m_active;
 }
 
 SDL_Rect* GuiButton::GetRect()
 {
 	return &m_rect;
 }
+
+std::string GuiButton::GetName()
+{
+	return m_name;
+}
+

@@ -36,8 +36,14 @@ void World::Initialise()
 	}
 
 	m_ship = new Spaceship(GetTile(rand()%m_columns,rand()%m_rows)); 
-	m_gui = new GuiButton(Config::WINDOW_WIDTH / 2, Config::WINDOW_HEIGHT - Config::TILE_SIZE, 48, 24, "HELLO");
-	
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 3, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 6, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 9, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 15, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/TradingPost.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 18, Config::WINDOW_HEIGHT - 48, "FallenStar", "../External/textures/FallenStar.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 21, Config::WINDOW_HEIGHT - 48, "StarChaser", "../External/textures/StarChaser.png"));
+	m_activeSpawnButton = m_guiButtons[0];
 }
 
 void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
@@ -47,7 +53,10 @@ void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 		t.second->Draw(p_r, p_g, p_b, p_a);
 	}
 	m_ship->Draw();
-	m_gui->Draw();
+	for(auto g:m_guiButtons)
+	{
+		g->Draw();
+	}
 }
 
 void World::Update(float p_delta)
@@ -58,6 +67,18 @@ void World::Update(float p_delta)
 		t.second->Update(p_delta);
 
 	}
+	for(auto g:m_guiButtons)
+	{
+		if(g!=m_activeSpawnButton)
+		{
+			g->SetActive(false);
+		}
+		else if(g==m_activeSpawnButton)
+		{
+			g->SetActive(true);
+		}
+	}
+	
 }
 
 Tile* World::GetTile(int p_gridX, int p_gridY)
@@ -76,11 +97,26 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	{
 		if(SDL_PointInRect(&p_pos,t.second->GetRect()))
 		{
-			t.second->HandleButtonEvent(p_ev.button);
+			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button == SDL_BUTTON_LEFT)
+			{
+				t.second->OnClick(m_activeSpawnButton->GetName());
+				
+			}
 		}
 	}
-	if(SDL_PointInRect(&p_pos,m_gui->GetRect()))
+
+	for(auto g:m_guiButtons)
 	{
-		m_gui->HandleButtonEvent(p_ev.button);
+		if (SDL_PointInRect(&p_pos, g->GetRect()))
+		{
+			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button==SDL_BUTTON_LEFT)
+			{
+				//g->SetActive(true);
+				m_activeSpawnButton = g;
+				
+		
+			}
+		}
 	}
+	
 }

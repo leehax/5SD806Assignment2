@@ -17,6 +17,7 @@ public:
 private:
 	unsigned int m_columns, m_rows, m_tileSize;
 	Spaceship* m_ship;
-	GuiButton* m_gui;
+	std::vector<std::shared_ptr<GuiButton>> m_guiButtons;
+	std::shared_ptr<GuiButton> m_activeSpawnButton;
 };
 

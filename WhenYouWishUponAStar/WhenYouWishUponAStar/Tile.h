@@ -24,6 +24,7 @@ public:
 	Vector2<int> GetWorldPos();
 	Vector2<int> GetGridPos();
 	void HandleButtonEvent(SDL_MouseButtonEvent& p_mEv);
+	void OnClick(std::string p_selectedSpawnType);
 	World* m_world;
 	bool IsBlocked(); //Todo: make a seperate AStarNode class
 	//TODO: Add an AStar Path class to keep our path (for the entity) And a recursive FindPath function that builds the list for us

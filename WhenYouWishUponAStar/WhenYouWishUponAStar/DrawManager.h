@@ -20,11 +20,12 @@ public:
 
 	SDL_Renderer* GetRenderer();
 	SDL_Window* GetWindow();
+	TTF_Font* GetDefFont();
 private:
 
 	SDL_Window* m_window;
 	SDL_Renderer* m_renderer;
-	TTF_Font* m_font;
+	TTF_Font* m_defaultFont;
 	bool LoadFont(const int p_size);
 	void UnloadFont();
 

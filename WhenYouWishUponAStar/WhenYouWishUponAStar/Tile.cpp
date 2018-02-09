@@ -24,7 +24,7 @@ Tile::Tile(int p_x, int p_y, int p_w, int p_h, int p_gridX, int p_gridY, int p_t
 	m_world = ServiceLocator<World>::GetService();
 	m_type = static_cast<Type>(p_type);
 	m_activeSprite = m_sprites[m_type];
-	m_blocked = (m_type == crater);
+	
 }
 
 Tile::~Tile()
@@ -152,6 +152,28 @@ void Tile::HandleButtonEvent(SDL_MouseButtonEvent& p_mEv)
 			}
 		}
 		
+	}
+}
+
+void Tile::OnClick(std::string p_selectedSpawnType)
+{
+	if(p_selectedSpawnType=="Dirt")
+	{
+		m_type = dirt;
+		m_activeSprite = m_sprites[0];
+
+	}
+	else if(p_selectedSpawnType=="Grass")
+	{
+		m_type = grass;
+		m_activeSprite = m_sprites[1];
+		
+	}
+	else if (p_selectedSpawnType == "Crater")
+	{
+		m_type = crater;
+		m_activeSprite = m_sprites[2];
+
 	}
 }
 
