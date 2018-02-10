@@ -36,13 +36,16 @@ void World::Initialise()
 	}
 
 	m_ship = new Spaceship(GetTile(rand()%m_columns,rand()%m_rows)); 
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 3, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 6, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 9, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 15, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/TradingPost.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 18, Config::WINDOW_HEIGHT - 48, "FallenStar", "../External/textures/FallenStar.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 21, Config::WINDOW_HEIGHT - 48, "StarChaser", "../External/textures/StarChaser.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 2, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 6, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 8, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/TradingPost.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/FallenStar.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 14, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 18, Config::WINDOW_HEIGHT - 48, "Unblock", "../External/textures/Empty.png"));
+
 	m_activeSpawnButton = m_guiButtons[0];
 }
 
