@@ -41,7 +41,7 @@ void World::Initialise()
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 6, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 8, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/TradingPost.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/FallenStar.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/Star.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 14, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 18, Config::WINDOW_HEIGHT - 48, "Unblock", "../External/textures/Empty.png"));
