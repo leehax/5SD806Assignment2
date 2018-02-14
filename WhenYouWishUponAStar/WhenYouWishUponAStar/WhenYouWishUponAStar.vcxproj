@@ -150,6 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AStarNode.h" />
+    <ClInclude Include="AStarPath.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="DrawManager.h" />
     <ClInclude Include="Engine.h" />
@@ -166,6 +168,8 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AStarNode.cpp" />
+    <ClCompile Include="AStarPath.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GuiButton.cpp" />
