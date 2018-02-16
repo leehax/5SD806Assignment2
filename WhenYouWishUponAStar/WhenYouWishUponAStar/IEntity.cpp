@@ -11,6 +11,11 @@ IEntity::~IEntity()
 {
 }
 
+void IEntity::SetCurTile(Tile* p_tile)
+{
+	m_curTile = p_tile;
+}
+
 Vector2<int> IEntity::GetGridPos()
 {
 	return m_curTile->GetGridPos();

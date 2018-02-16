@@ -14,7 +14,7 @@ enum Type{dirt, grass, crater};
 class Tile 
 {
 public:
-	Tile(int p_x,  int p_y,  int p_w,  int p_h, int p_gridX, int p_gridY, int p_type);
+	Tile(int p_x,  int p_y,  int p_w,  int p_h, int p_gridX, int p_gridY);
 	~Tile();
 	SDL_Rect* GetRect();
 	void Draw(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a);
@@ -33,6 +33,7 @@ public:
 
 private:
 	Type m_type;
+	Type m_previousType;
 	bool m_blocked;
 	SDL_Rect m_rect;
 	DrawManager* m_drawManager;

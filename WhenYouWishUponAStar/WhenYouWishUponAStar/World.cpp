@@ -2,6 +2,10 @@
 #include "World.h"
 #include <ctime>
 #include "Tile.h"
+#include "StarChaser.h"
+#include "Spaceship.h"
+#include "GuiButton.h"
+#include <iostream>
 
 World::World()
 {
@@ -29,13 +33,17 @@ void World::Initialise()
 	{
 		for (int y = 0; y < m_rows; y++)
 		{
-			Tile* tile = new Tile(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, x, y, rand()%3);
+			Tile* tile = new Tile(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, x, y);
 			m_tiles[std::make_pair(x, y)] = tile;
 
 		}
 	}
 
-	m_ship = new Spaceship(GetTile(rand()%m_columns,rand()%m_rows)); 
+	 
+	m_ship = std::make_shared<Spaceship>(GetTile(rand() % m_columns, rand() % m_rows));
+	m_starchsr = std::make_shared<StarChaser>(GetTile(rand() % m_columns, rand() % m_rows));
+	m_entities.push_back(m_ship);
+	m_entities.push_back(m_starchsr);
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 2, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 6, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
@@ -44,7 +52,6 @@ void World::Initialise()
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 12, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/Star.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 14, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 18, Config::WINDOW_HEIGHT - 48, "Unblock", "../External/textures/Empty.png"));
 
 	m_activeSpawnButton = m_guiButtons[0];
 }
@@ -55,10 +62,14 @@ void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 	{
 		t.second->Draw(p_r, p_g, p_b, p_a);
 	}
-	m_ship->Draw();
+	
 	for(auto g:m_guiButtons)
 	{
 		g->Draw();
+	}
+	for(auto e:m_entities)
+	{
+		e->Draw();
 	}
 }
 
@@ -81,7 +92,10 @@ void World::Update(float p_delta)
 			g->SetActive(true);
 		}
 	}
-	
+	for (auto e : m_entities)
+	{
+		e->Update(p_delta);
+	}
 }
 
 Tile* World::GetTile(int p_gridX, int p_gridY)
@@ -100,9 +114,46 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	{
 		if(SDL_PointInRect(&p_pos,t.second->GetRect()))
 		{
+			
 			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button == SDL_BUTTON_LEFT)
-			{
-				t.second->OnClick(m_activeSpawnButton->GetName());
+			{	
+				if (m_activeSpawnButton->GetName() == "Dirt" || m_activeSpawnButton->GetName() == "Grass" ||
+					m_activeSpawnButton->GetName() == "Crater" ) {
+					t.second->OnClick(m_activeSpawnButton->GetName());
+				}
+				else if(m_activeSpawnButton->GetName() == "Block")
+				{
+					for(auto e:m_entities)
+					{
+						if(e->GetCurrentTile()!=t.second)
+						{
+							t.second->OnClick(m_activeSpawnButton->GetName());
+						}
+					}
+				}
+				else if(m_activeSpawnButton->GetName() == "Ship")
+				{
+					
+						if(m_ship)
+						{
+							m_ship->SetCurTile(t.second);
+						}
+						else if (m_ship==nullptr)
+						{
+							m_ship = std::make_shared<Spaceship>(t.second);
+						}
+					
+				}
+				else if(m_activeSpawnButton->GetName() == "StarChsr")
+				{
+					for (auto e : m_entities)
+					{
+						if (e->GetType() == "StarChsr")
+						{
+							e->SetCurTile(t.second);
+						}
+					}
+				}
 				
 			}
 		}
@@ -123,3 +174,15 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	}
 	
 }
+
+std::vector<Tile*> World::GetTiles()
+{
+	std::vector<Tile*> tiles;
+	for(auto t:m_tiles)
+	{
+		tiles.push_back(t.second);
+	}
+	return tiles;
+}
+
+

@@ -14,7 +14,7 @@ public:
 
 	virtual void Update(float p_delta)=0;
 	virtual void Draw()=0;
-
+	virtual void SetCurTile(Tile* p_tile);
 	virtual Vector2<int> GetGridPos();
 	virtual Vector2<int> GetWorldPos();
 	virtual Tile* GetCurrentTile();

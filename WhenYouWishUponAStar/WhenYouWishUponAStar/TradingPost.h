@@ -1,12 +1,11 @@
 #pragma once
 #include "IEntity.h"
-#include <memory>
-
-class StarChaser :public IEntity
+class TradingPost :
+	public IEntity
 {
 public:
-	StarChaser(Tile* p_tile);
-	~StarChaser();
+	TradingPost();
+	~TradingPost();
 	void Update(float p_delta) override;
 	void Draw() override;
 
@@ -14,8 +13,5 @@ public:
 	Vector2<int> GetWorldPos() override;
 	Tile* GetCurrentTile()override;
 	std::string GetType()override;
-private:
-	Sprite* m_spriteWithStar;
-	Sprite* m_spriteWithoutStar;
 };
 

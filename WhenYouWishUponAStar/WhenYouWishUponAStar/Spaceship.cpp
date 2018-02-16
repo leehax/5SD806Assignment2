@@ -11,6 +11,7 @@ Spaceship::Spaceship(Tile* p_tile)
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
 	m_sprite = m_spriteManager->CreateSprite("../External/textures/Spaceship.png", 0, 0, 32, 32);
 	m_curTile = p_tile;
+	m_type = "Ship";
 }
 
 
