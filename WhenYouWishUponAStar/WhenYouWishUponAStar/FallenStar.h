@@ -1,13 +1,15 @@
 #pragma once
 #include "IEntity.h"
-class Spaceship :
-	public IEntity
+
+class FallenStar:public IEntity
 {
 public:
-	Spaceship();
-	~Spaceship();
+	FallenStar();
+	~FallenStar();
+
 	void Update(float p_delta) override;
 	void Draw() override;
+
 
 };
 

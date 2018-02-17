@@ -6,7 +6,8 @@ class IEntity;
 class GuiButton;
 class Spaceship;
 class StarChaser;
-
+class FallenStar;
+class TradingPost;
 class World :
 	public IGridMap
 {
@@ -19,12 +20,16 @@ public:
 	Tile* GetTile(int p_gridX, int p_gridY) override;
 	void HandleEvent(SDL_Event& p_ev, SDL_Point p_pos) override;
 	std::vector<Tile*> GetTiles();
+	bool EntityOnTile(Tile* p_tile);
 private:
 	unsigned int m_columns, m_rows, m_tileSize;
-	std::shared_ptr<Spaceship> m_ship;
-	std::shared_ptr<StarChaser> m_starchsr;
-	std::vector<std::shared_ptr<IEntity>> m_entities;
+
+	std::unique_ptr<Spaceship> m_ship;
+	std::unique_ptr<StarChaser> m_starChaser;
+	std::unique_ptr<FallenStar> m_fallenStar;
+	std::unique_ptr<TradingPost> m_tradingPost;
+
 	std::vector<std::shared_ptr<GuiButton>> m_guiButtons;
-	std::shared_ptr<GuiButton> m_activeSpawnButton;
+	std::shared_ptr<GuiButton> m_selectedGuiButton;
 };
 

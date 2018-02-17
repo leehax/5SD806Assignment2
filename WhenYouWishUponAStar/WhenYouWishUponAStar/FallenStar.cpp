@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "Spaceship.h"
+#include "FallenStar.h"
+#include "ServiceLocator.h"
+#include "Sprite.h"
 #include "SpriteManager.h"
 #include "DrawManager.h"
-#include "Sprite.h"
-#include "Tile.h"
-#include "ServiceLocator.h"
-Spaceship::Spaceship()
+
+FallenStar::FallenStar()
 {
 	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
-	m_sprite = m_spriteManager->CreateSprite("../External/textures/Spaceship.png", 0, 0, 32, 32);
-	m_type = "Ship";
+	m_sprite = m_spriteManager->CreateSprite("../External/textures/Star.png", 0, 0, 32, 32);  
+	m_type = "FllnStar";
 }
 
 
-Spaceship::~Spaceship()
+FallenStar::~FallenStar()
 {
 	delete m_sprite;
 	m_sprite = nullptr;
@@ -24,11 +24,14 @@ Spaceship::~Spaceship()
 	m_drawManager = nullptr;
 }
 
-void Spaceship::Update(float p_delta)
+void FallenStar::Update(float p_delta)
 {
 }
 
-void Spaceship::Draw()
+void FallenStar::Draw()
 {
 	m_drawManager->Draw(m_sprite, GetWorldPos().x, GetWorldPos().y, 1);
+
 }
+
+

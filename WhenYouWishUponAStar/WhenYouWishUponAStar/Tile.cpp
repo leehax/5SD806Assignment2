@@ -37,6 +37,14 @@ Tile::Tile(int p_x, int p_y, int p_w, int p_h, int p_gridX, int p_gridY)
 	{
 		m_type = crater;
 	}
+	if(randomtype==77)
+	{
+		SetBlocked(true);
+	}
+	else
+	{
+		SetBlocked(false);
+	}
 
 	m_activeSprite = m_sprites[m_type];
 	
@@ -195,15 +203,17 @@ void Tile::OnClick(std::string p_selectedSpawnType)
 		m_blocked = false;
 
 	}
-	else if(p_selectedSpawnType=="Block")
-	{
-		m_blocked = true;
-	}
+	
 }
 
 bool Tile::IsBlocked()
 {
 	return m_blocked;
+}
+
+void Tile::SetBlocked(bool p_val)
+{
+	m_blocked = p_val;
 }
 
 

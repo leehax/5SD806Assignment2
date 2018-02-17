@@ -155,9 +155,12 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="DrawManager.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="FallenStar.h" />
+    <ClInclude Include="FiniteStateMachine.h" />
     <ClInclude Include="GuiButton.h" />
     <ClInclude Include="IEntity.h" />
     <ClInclude Include="IGridMap.h" />
+    <ClInclude Include="IState.h" />
     <ClInclude Include="ServiceLocator.h" />
     <ClInclude Include="Spaceship.h" />
     <ClInclude Include="Sprite.h" />
@@ -174,6 +177,8 @@
     <ClCompile Include="AStarPath.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="FallenStar.cpp" />
+    <ClCompile Include="FiniteStateMachine.cpp" />
     <ClCompile Include="GuiButton.cpp" />
     <ClCompile Include="IEntity.cpp" />
     <ClCompile Include="Spaceship.cpp" />

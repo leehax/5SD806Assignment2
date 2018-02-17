@@ -29,15 +29,11 @@ Engine::~Engine()
 void Engine::Initialise()
 {
 	m_drawManager = new DrawManager();
-	
-	m_world = new World();
-	
 	m_drawManager->Initialise();
 	m_spriteManager = new SpriteManager(m_drawManager->GetRenderer());
-
+	m_world = new World();
 	ServiceLocator<DrawManager>::ProvideService(m_drawManager);
 	ServiceLocator<SpriteManager>::ProvideService(m_spriteManager);
-	ServiceLocator<World>::ProvideService(m_world);
 	m_world->Initialise();
 	isRunning = true;
 }
