@@ -2,7 +2,7 @@
 #include <vector>
 #include "Sprite.h"
 #include "Config.h"
-
+#include "Math.h"
 
 
 class World;
@@ -25,12 +25,13 @@ public:
 	Vector2<int> GetGridPos();
 	void HandleButtonEvent(SDL_MouseButtonEvent& p_mEv);
 	void OnClick(std::string p_selectedSpawnType);
+
 	World* m_world;
 	bool IsBlocked(); 
 	void SetBlocked(bool p_val);
-
-private:
 	Type m_type;
+private:
+	
 	Type m_previousType;
 	bool m_blocked;
 	SDL_Rect m_rect;

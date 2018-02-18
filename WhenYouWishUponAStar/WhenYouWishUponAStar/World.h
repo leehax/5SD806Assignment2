@@ -19,8 +19,9 @@ public:
 	void Update(float p_delta) override;
 	Tile* GetTile(int p_gridX, int p_gridY) override;
 	void HandleEvent(SDL_Event& p_ev, SDL_Point p_pos) override;
-	std::vector<Tile*> GetTiles();
+	std::map<std::pair<int,int>,Tile*> GetTiles();
 	bool EntityOnTile(Tile* p_tile);
+	Tile* GetTileWithEntity(const std::string p_type);
 private:
 	unsigned int m_columns, m_rows, m_tileSize;
 

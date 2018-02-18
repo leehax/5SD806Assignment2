@@ -1,6 +1,7 @@
 #pragma once
-#include "Config.h"
+
 #include <vector>
+#include "Math.h"
 class Tile;
 class SpriteManager;
 class DrawManager;

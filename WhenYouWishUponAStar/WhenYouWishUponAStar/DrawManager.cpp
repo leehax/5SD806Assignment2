@@ -57,9 +57,9 @@ void DrawManager::DrawRect(SDL_Rect& p_rect, Uint8 p_r, Uint8 p_g, Uint8 p_b, Ui
 	SDL_RenderDrawRect(m_renderer, &p_rect);
 }
 
-void DrawManager::DrawLine(int p_xPos, int p_yPos, int p_xTarget, int p_yTarget)
+void DrawManager::DrawLine(int p_xPos, int p_yPos, int p_xTarget, int p_yTarget, Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 {
-	SDL_SetRenderDrawColor(m_renderer, 255, 0, 0, 255);
+	SDL_SetRenderDrawColor(m_renderer, p_r, p_g, p_b, p_a);
 	SDL_RenderDrawLine(m_renderer, p_xPos, p_yPos, p_xTarget, p_yTarget);
 }
 

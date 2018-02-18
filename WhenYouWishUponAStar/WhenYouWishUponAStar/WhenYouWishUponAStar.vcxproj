@@ -161,6 +161,7 @@
     <ClInclude Include="IEntity.h" />
     <ClInclude Include="IGridMap.h" />
     <ClInclude Include="IState.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="ServiceLocator.h" />
     <ClInclude Include="Spaceship.h" />
     <ClInclude Include="Sprite.h" />

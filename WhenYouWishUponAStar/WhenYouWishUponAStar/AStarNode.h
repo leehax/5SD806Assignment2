@@ -4,17 +4,17 @@ class Tile;
 class AStarNode
 {
 public:
-	AStarNode();
+	AStarNode(Tile* p_tile);
 	~AStarNode();
 
-	int m_fCost = 0; //f=g+h
+	int GetFCost();
 	int m_gCost = 0; //travel/accumulated cost
 	int m_hCost = 0; //heuristic cost
-	int m_typeModifier = 0;
+	int TypeModifier();
 
-	std::shared_ptr < Tile > m_tile = nullptr;
-	std::shared_ptr < AStarNode > m_parentNode= nullptr;
+	Tile* m_tile = nullptr;
+	AStarNode* m_parentNode= nullptr;
 
-	bool m_blocked; //get m_tile blocked
+	bool m_blocked(); //get m_tile blocked
 };
 

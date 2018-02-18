@@ -47,14 +47,19 @@ void World::Initialise()
 
 ;
 	m_ship = std::make_unique<Spaceship>();
-	m_starChaser = std::make_unique<StarChaser>(*this);
-	m_fallenStar = std::make_unique<FallenStar>();
-	m_tradingPost= std::make_unique<TradingPost>();
-
 	m_ship->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
-	m_starChaser->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+
+	m_fallenStar = std::make_unique<FallenStar>();
 	m_fallenStar->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+
+	m_tradingPost= std::make_unique<TradingPost>();
 	m_tradingPost->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+
+	m_starChaser = std::make_unique<StarChaser>(this);
+	m_starChaser->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	//m_starChaser->SetState("Collect");
+	m_starChaser->FindPath();
+	
 
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
@@ -108,6 +113,8 @@ void World::Update(float p_delta)
 	m_starChaser->Update(p_delta);
 	m_fallenStar->Update(p_delta);
 	m_tradingPost->Update(p_delta);
+
+	
 }
 
 Tile* World::GetTile(int p_gridX, int p_gridY)
@@ -126,7 +133,8 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	{
 		if(SDL_PointInRect(&p_pos,t.second->GetRect()))
 		{
-			
+			m_starChaser->ClearPath();
+			m_starChaser->FindPath();
 			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button == SDL_BUTTON_LEFT)
 			{	
 				if (m_selectedGuiButton->GetName() == "Dirt" || m_selectedGuiButton->GetName() == "Grass" ||
@@ -138,6 +146,8 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 					if(EntityOnTile(t.second)==false)
 					{
 						t.second->SetBlocked(true);
+					
+					
 					}
 				}
 				else if (m_selectedGuiButton->GetName() == "Ship")
@@ -156,6 +166,8 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 					if (m_starChaser)
 					{
 						m_starChaser->SetCurTile(t.second);
+					
+					
 					}
 
 
@@ -201,19 +213,36 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	
 }
 
-std::vector<Tile*> World::GetTiles()
+std::map<std::pair<int, int>, Tile*> World::GetTiles()
 {
-	std::vector<Tile*> tiles;
-	for(auto t:m_tiles)
-	{
-		tiles.push_back(t.second);
-	}
-	return tiles;
+	return m_tiles;
 }
 
 bool World::EntityOnTile(Tile* p_tile)
 {
 	return m_ship->GetCurrentTile() == p_tile || m_starChaser->GetCurrentTile() == p_tile || m_fallenStar->GetCurrentTile() == p_tile || m_tradingPost->GetCurrentTile() == p_tile;
+}
+
+Tile* World::GetTileWithEntity(const std::string p_type)
+{
+	if(p_type=="FllnStar")
+	{
+		return m_fallenStar->GetCurrentTile();
+	}
+	else if(p_type=="TrPost")
+	{
+		return m_ship->GetCurrentTile();
+	}
+	else if(p_type=="Ship")
+	{
+		return m_ship->GetCurrentTile();
+	}
+	else if(p_type=="StarChsr")
+	{
+		return m_starChaser->GetCurrentTile();
+	}
+
+	return nullptr;
 }
 
 

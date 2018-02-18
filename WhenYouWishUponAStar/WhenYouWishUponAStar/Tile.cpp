@@ -22,7 +22,7 @@ Tile::Tile(int p_x, int p_y, int p_w, int p_h, int p_gridX, int p_gridY)
 	m_gridY = p_gridY;
 	m_x = p_x;
 	m_y = p_y;
-	m_world = ServiceLocator<World>::GetService();
+	//m_world = ServiceLocator<World>::GetService();
 	int randomtype = rand() % 100;
 
 	if(randomtype <=50)
@@ -85,46 +85,46 @@ void Tile::Update(float p_delta)
 void Tile::FindNeighbours()
 {
 	
-	if(m_world->GetTile(m_gridX - 1, m_gridY - 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY - 1));
-	}
+	//if(m_world->GetTile(m_gridX - 1, m_gridY - 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY - 1));
+	//}
 
-	if(m_world->GetTile(m_gridX, m_gridY - 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX, m_gridY - 1));
-	}
-	
-	if(m_world->GetTile(m_gridX + 1, m_gridY - 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY - 1));
-	}
+	//if(m_world->GetTile(m_gridX, m_gridY - 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX, m_gridY - 1));
+	//}
+	//
+	//if(m_world->GetTile(m_gridX + 1, m_gridY - 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY - 1));
+	//}
 
 
-	if (m_world->GetTile(m_gridX - 1, m_gridY))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY));
-	}
-	
-	if (m_world->GetTile(m_gridX + 1, m_gridY))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY));
-	}
-	
-	if (m_world->GetTile(m_gridX - 1, m_gridY + 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY + 1));
-	}
-	
-	if (m_world->GetTile(m_gridX, m_gridY + 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX, m_gridY + 1));
-	}
+	//if (m_world->GetTile(m_gridX - 1, m_gridY))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY));
+	//}
+	//
+	//if (m_world->GetTile(m_gridX + 1, m_gridY))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY));
+	//}
+	//
+	//if (m_world->GetTile(m_gridX - 1, m_gridY + 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX - 1, m_gridY + 1));
+	//}
+	//
+	//if (m_world->GetTile(m_gridX, m_gridY + 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX, m_gridY + 1));
+	//}
 
-	if (m_world->GetTile(m_gridX + 1, m_gridY + 1))
-	{
-		m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY + 1));
-	}
+	//if (m_world->GetTile(m_gridX + 1, m_gridY + 1))
+	//{
+	//	m_neighbours.push_back(m_world->GetTile(m_gridX + 1, m_gridY + 1));
+	//}
 
 	
 	

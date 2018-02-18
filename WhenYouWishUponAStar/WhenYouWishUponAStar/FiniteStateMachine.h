@@ -1,14 +1,18 @@
 #pragma once
 #include "IState.h"
+#include <map>
+
 class FiniteStateMachine
 {
 public:
 	FiniteStateMachine();
 	~FiniteStateMachine();
-	void SetState(IState* p_state);
-	void Update(float p_delta);
-private:
-
-	IState* m_activeState;
+	void SetState(const std::string p_name);
+	void UpdateState(float p_delta);
+	void AddState(const std::string p_name, IState* p_state);
+	void Destroy();
+protected:
+	std::map<std::string, IState*> m_states;
+	IState* m_activeState=nullptr;
 };
 
