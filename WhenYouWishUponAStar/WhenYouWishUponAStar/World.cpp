@@ -32,9 +32,9 @@ void World::Initialise()
 {
 	srand(time(NULL));
 
-	for (int x = 0; x < m_columns; x++)
+	for (unsigned int x = 0; x < m_columns; x++)
 	{
-		for (int y = 0; y < m_rows; y++)
+		for (unsigned int y = 0; y < m_rows; y++)
 		{
 			Tile* tile = new Tile(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, x, y);
 			m_tiles[std::make_pair(x, y)] = tile;
@@ -57,8 +57,8 @@ void World::Initialise()
 
 	m_starChaser = std::make_unique<StarChaser>(this);
 	m_starChaser->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
-	//m_starChaser->SetState("Collect");
-	m_starChaser->FindPath();
+	m_starChaser->SetState("Collect");
+	
 	
 
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
@@ -133,10 +133,12 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 	{
 		if(SDL_PointInRect(&p_pos,t.second->GetRect()))
 		{
-			m_starChaser->ClearPath();
-			m_starChaser->FindPath();
+			
+			
 			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button == SDL_BUTTON_LEFT)
 			{	
+				
+
 				if (m_selectedGuiButton->GetName() == "Dirt" || m_selectedGuiButton->GetName() == "Grass" ||
 					m_selectedGuiButton->GetName() == "Crater" ) {
 					t.second->OnClick(m_selectedGuiButton->GetName());
@@ -192,7 +194,7 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 
 
 				}
-				
+				m_starChaser->RecalculatePath();
 			}
 		}
 	}

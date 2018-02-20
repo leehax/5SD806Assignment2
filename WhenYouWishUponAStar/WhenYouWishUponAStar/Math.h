@@ -25,7 +25,7 @@ float Length(Vector2<T> v)
 
 }
 template <typename T>
-float Manhattan(Vector2<T> lhs, Vector2<T> rhs)
+int Manhattan(Vector2<T> lhs, Vector2<T> rhs)
 {
 
 	return (abs(lhs.x - rhs.x) + abs(lhs.y - rhs.y));

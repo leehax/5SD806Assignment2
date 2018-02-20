@@ -8,64 +8,61 @@
 class FallenStar;
 class World;
 class FiniteStateMachine;
-//class StarChaser;
-//class ChaserState :public IState
-//{
-//
-//protected:
-//	StarChaser& m_starChaser;
-//	World& m_world;
-//	Tile* m_targetTile = nullptr;
-//	AStarPath* m_pathFinding;	
-//public:
-//	ChaserState(StarChaser& p_chaser, World& p_world)
-//		: m_starChaser(p_chaser),
-//		  m_world(p_world), m_pathFinding(new AStarPath(p_world))
-//	{
-//	}
-//	void Draw();
-//};
-//class State_Collect :public ChaserState
-//{
-//public:
-//
-//	State_Collect(StarChaser& p_chaser, World& p_world)
-//		: ChaserState(p_chaser, p_world)
-//	{
-//	}
-//
-//	void Enter() override final;
-//	void Update(float p_delta) override final;
-//	void Exit() override final;
-//};
-//class State_Sell :public ChaserState
-//{
-//public:
-//	State_Sell(StarChaser& p_chaser, World& p_world)
-//		: ChaserState(p_chaser, p_world)
-//	{
-//	}
-//
-//	void Enter() override final;
-//	void Update(float p_delta) override final;
-//	void Exit() override final;
-//
-//private:
-//	float m_energy = 100.f;
-//};
-//class State_Rest :public ChaserState
-//{
-//public:
-//	State_Rest(StarChaser& p_chaser, World& p_world)
-//		: ChaserState(p_chaser, p_world)
-//	{
-//	}
-//
-//	void Enter() override final;
-//	void Update(float p_delta) override final;
-//	void Exit() override final;
-//
-//};
+class StarChaser;
+class ChaserState :public IState
+{
+
+protected:
+	StarChaser& m_starChaser;
+public:
+	ChaserState(StarChaser& p_chaser)
+		: m_starChaser(p_chaser)
+	{
+	}
+};
+class State_Collect :public ChaserState
+{
+public:
+
+	State_Collect(StarChaser& p_chaser)
+		: ChaserState(p_chaser)
+	{
+	}
+
+	void Enter() override final;
+	void Update(float p_delta) override final;
+	void Exit() override final;
+};
+class State_Sell :public ChaserState
+{
+public:
+	State_Sell(StarChaser& p_chaser)
+		: ChaserState(p_chaser)
+	{
+	}
+
+	void Enter() override final;
+	void Update(float p_delta) override final;
+	void Exit() override final;
+
+private:
+	float m_energy = 100.f;
+};
+class State_Rest :public ChaserState
+{
+public:
+	State_Rest(StarChaser& p_chaser)
+		: ChaserState(p_chaser)
+	{
+	}
+
+	void Enter() override final;
+	void Update(float p_delta) override final;
+	void Exit() override final;
+
+private:
+	float m_timeToRest = 1.f;
+};
 
 class StarChaser :public IEntity, public FiniteStateMachine
 {
@@ -74,17 +71,20 @@ public:
 	~StarChaser();
 	void Update(float p_delta) override;
 	void Draw() override;
-	void FindPath();
-	void ClearPath();
-
+	void SetTargetTile(const std::string p_targetEntitityType);
+	bool AtTargetTile();
+	void SetHasStar(bool p_hasStar);
+	bool HasStar();
+	void RecalculatePath();
 private:
+
 	Tile* m_targetTile = nullptr;
 	AStarPath* m_pathFinding;
 	World* m_world;
 	Sprite* m_spriteWithStar;
 	Sprite* m_spriteWithoutStar;
-	
-
+	bool m_hasStar;
+	std::vector< Tile* > m_path;
 
 };
 

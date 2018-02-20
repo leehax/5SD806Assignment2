@@ -13,33 +13,30 @@ class AStarPath
 public:
 	AStarPath(World* p_world);
 	~AStarPath();
-
-	std::map<std::pair<int,int>,AStarNode*> m_nodes;
 	
-	void FindPath(Tile* p_currentTile, Tile* p_targetTile); //Recursive path finding func
-	Tile* NextTileInPath();
-
-	void ClearOpenNodes();
-	void ClearClosedNodes();
-	void ClearCurrentPath();
-	void Clear();
+	std::vector< Tile* > FindPath(Tile* p_currentTile, Tile* p_targetTile); //Test with returning a vector of nodes, and having the agent construct the vector of tiles from that data
+	void Recalculate();
 	void Draw();
+
 private:
 
 	bool m_initialized;
 	void Initialize(Tile* p_currentTile, Tile* p_targetTile);
-	AStarNode* NextNodeInPath();
-	void RecursivePathFinding();
+
+	std::vector< Tile* > RecursivePathFinding();
+	std::vector< Tile* > m_tilesInPath;
+
 	AStarNode* m_startingNode;
 	AStarNode* m_currentNode;
 	AStarNode* m_goalNode;
 
-	std::vector < AStarNode*> m_openNodes; //todo: implement linked list maybe
+	std::map<std::pair<int, int>, AStarNode*> m_nodes;
+	std::vector < AStarNode*> m_openNodes; 
 	std::vector < AStarNode*> m_closedNodes;
-	std::vector < AStarNode*> AdjacentNodes(AStarNode* p_cur);
-	std::vector< Tile* > m_tilesInPath;
 	std::vector < AStarNode*> m_nodesInPath;
+	std::vector < AStarNode*> AdjacentNodes(AStarNode* p_cur);
+	
 	DrawManager* m_drawManager;
-	int m_recurseAmount;
+
 };
 
