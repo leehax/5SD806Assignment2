@@ -22,6 +22,8 @@ public:
 	std::map<std::pair<int,int>,Tile*> GetTiles();
 	bool EntityOnTile(Tile* p_tile);
 	Tile* GetTileWithEntity(const std::string p_type);
+	void MoveStar(Tile* p_tile);
+	void UpdateStarState(const std::string p_state);
 private:
 	unsigned int m_columns, m_rows, m_tileSize;
 

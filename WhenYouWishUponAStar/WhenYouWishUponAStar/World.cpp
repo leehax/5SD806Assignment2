@@ -65,7 +65,7 @@ void World::Initialise()
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 7, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 13, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/TradingPost.png"));
+	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 13, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/Trader.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/Star.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 19, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
 	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 22, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
@@ -109,12 +109,12 @@ void World::Update(float p_delta)
 			g->SetActive(true);
 		}
 	}
+
 	m_ship->Update(p_delta);
 	m_starChaser->Update(p_delta);
 	m_fallenStar->Update(p_delta);
 	m_tradingPost->Update(p_delta);
 
-	
 }
 
 Tile* World::GetTile(int p_gridX, int p_gridY)
@@ -233,7 +233,7 @@ Tile* World::GetTileWithEntity(const std::string p_type)
 	}
 	else if(p_type=="TrPost")
 	{
-		return m_ship->GetCurrentTile();
+		return m_tradingPost->GetCurrentTile();
 	}
 	else if(p_type=="Ship")
 	{
@@ -246,5 +246,31 @@ Tile* World::GetTileWithEntity(const std::string p_type)
 
 	return nullptr;
 }
+
+void World::MoveStar(Tile* p_tile)
+{
+	m_fallenStar->SetCurTile(p_tile);
+}
+
+void World::UpdateStarState(const std::string p_state)
+{
+	if(p_state=="PickedUp")
+	{
+		m_fallenStar->Hide(true);
+	}
+	else if (p_state=="Dropped")
+	{
+		m_fallenStar->Hide(false);
+		m_fallenStar->SetCurTile(m_starChaser->GetCurrentTile());
+
+	}
+	else if(p_state=="Sold")
+	{
+		m_fallenStar->Hide(false);
+		m_fallenStar->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	}
+}
+
+
 
 

@@ -9,24 +9,25 @@
 #include <iostream>
 
 
+
 void State_Collect::Enter()
 {
 	//find star
 	m_starChaser.SetTargetTile("FllnStar");
-	m_starChaser.SetHasStar(false);
+	m_starChaser.RecalculatePath();
 }
 void State_Sell::Enter()
 {
 	//find trading post
 	m_starChaser.SetTargetTile("TrPost");
-	m_starChaser.SetHasStar(true);
+	m_starChaser.RecalculatePath();
 	m_energy = 100.f;
 }
 void State_Rest::Enter()
 {
 	//find ship
 	m_starChaser.SetTargetTile("Ship");
-	m_starChaser.SetHasStar(false);
+	m_starChaser.RecalculatePath();
 	m_timeToRest = 1.f;
 }
 
@@ -35,48 +36,79 @@ void State_Collect::Update(float p_delta)
 	
 	
 	//travel to star
-
-	//once traveled to star -> SetState(sell)
-	if(m_starChaser.AtTargetTile())
+	if (m_starChaser.AtTargetTile()==false)
 	{
+		m_starChaser.MoveToNextTile();
+	}
+	
+	//once traveled to star -> SetState(sell)
+	else if(m_starChaser.AtTargetTile())
+	{
+		//star picked up, notify world to hide it
+		m_starChaser.Notify("PickedUp");
 		m_starChaser.SetState("Sell");
+		
+		
 	}
 	
 }
 
 void State_Sell::Update(float p_delta)
 {
-	
+
 
 	//travel to trading post
-	m_energy -= p_delta*10.f;
-	//once traveled to -> SetState(collect)
-	if(m_starChaser.AtTargetTile())
+	if (m_starChaser.AtTargetTile() == false)
 	{
-		m_starChaser.SetState("Collect");
+		m_starChaser.MoveToNextTile();
+		m_energy -= 10.f;
+		//if fatigued ->SetState(rest)
+		if (m_energy <= 0.f)
+		{
+			//star dropped, notify world to move star here
+			m_starChaser.Notify("Dropped");
+			m_starChaser.SetState("Rest");
+
+			
+		}
 	}
-	//else if fatigued ->SetState(rest)
-	if(m_energy<=0.f)
+
+	//once traveled to -> SetState(collect)
+	else if (m_starChaser.AtTargetTile())
 	{
-		m_starChaser.SetState("Rest");
+		//star sold, notify world to make a new star
+		m_starChaser.Notify("Sold");
+		m_starChaser.SetState("Collect");
+
+		
 	}
 }
+	
 
 void State_Rest::Update(float p_delta)
 {
 	
 
 	//travel to ship
-	
+	if (m_starChaser.AtTargetTile() == false)
+	{
+		m_starChaser.MoveToNextTile();
+	}
+
 	//once traveled to ship -> Rest()
-	if(m_starChaser.AtTargetTile())
+	else if(m_starChaser.AtTargetTile())
 	{
 
-		m_timeToRest -= p_delta;
+		m_timeToRest -= p_delta*60.f;
 		//once rested -> SetState(collect)
+		m_starChaser.Notify("Resting");
+		
 		if(m_timeToRest<=0)
 		{
+			//find the star where we last dropped it
 			m_starChaser.SetState("Collect");
+			m_starChaser.Notify("Collecting");
+			
 		}
 	}
 
@@ -91,6 +123,20 @@ void State_Sell::Exit()
 void State_Rest::Exit()
 {
 }
+void State_Collect::UpdateTarget()
+{
+	m_starChaser.SetTargetTile("FllnStar");
+}
+
+void State_Sell::UpdateTarget()
+{
+	m_starChaser.SetTargetTile("TrPost");
+}
+
+void State_Rest::UpdateTarget()
+{
+	m_starChaser.SetTargetTile("Ship");
+}
 
 StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new AStarPath(p_world))
 {
@@ -98,6 +144,7 @@ StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new ASt
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
 	m_spriteWithoutStar = m_spriteManager->CreateSprite("../External/textures/StarChaser.png", 0, 0, 32, 32);
 	m_spriteWithStar = m_spriteManager->CreateSprite("../External/textures/StarChaserWithStar.png", 0, 0, 32, 32);
+	m_spriteResting = m_spriteManager->CreateSprite("../External/textures/StarChaserResting.png", 0, 0, 32, 32);
 	m_sprite = m_spriteWithoutStar;
 	m_type = "StarChsr";
 	
@@ -116,7 +163,9 @@ StarChaser::~StarChaser()
 	m_spriteWithStar = nullptr;
 	delete m_spriteWithoutStar;
 	m_spriteWithoutStar = nullptr;
-	delete m_sprite;
+	delete m_spriteResting;
+	m_spriteWithoutStar = nullptr;
+
 	m_sprite = nullptr;
 
 	delete m_spriteManager;
@@ -130,7 +179,11 @@ StarChaser::~StarChaser()
 
 void StarChaser::Update(float p_delta)
 {	
-	UpdateState(p_delta);
+	m_actTimer -= p_delta;
+	if (m_actTimer <= 0) {
+		m_actTimer = 1.f;
+		UpdateState(p_delta);
+	}
 }
 
 void StarChaser::Draw()
@@ -151,30 +204,51 @@ bool StarChaser::AtTargetTile()
 	return m_curTile == m_targetTile;
 }
 
-void StarChaser::SetHasStar(bool p_hasStar)
+void StarChaser::Notify(const std::string p_msg)
 {
-	if(p_hasStar)
-	{
-		m_sprite = m_spriteWithStar;
-		m_hasStar = true;
-	}
-	else
+	if(p_msg=="Collecting")
 	{
 		m_sprite = m_spriteWithoutStar;
-		m_hasStar = false;
+		
+	}
+	else if(p_msg=="PickedUp")
+	{
+		m_sprite = m_spriteWithStar;
+		m_world->UpdateStarState("PickedUp");
+
+	}
+	else if(p_msg=="Sold")
+	{
+		m_sprite = m_spriteWithoutStar;
+		m_world->UpdateStarState("Sold");
+	}
+	else if(p_msg=="Dropped")
+	{
+		m_sprite = m_spriteWithoutStar;
+		m_world->UpdateStarState("Dropped");
+	}
+	else if(p_msg=="Resting")
+	{
+		m_sprite = m_spriteResting;
 	}
 }
 
-bool StarChaser::HasStar()
-{
-	return m_hasStar;
-}
 
 void StarChaser::RecalculatePath()
 {
+	ChaserState* state = static_cast<ChaserState*>(m_activeState);
+	state->UpdateTarget();
 	m_pathFinding->Recalculate();
 	if (m_targetTile) {
 		m_path = m_pathFinding->FindPath(GetCurrentTile(), m_targetTile);
+	}
+}
+
+void StarChaser::MoveToNextTile()
+{
+	if (m_path.empty() == false) {
+		m_curTile = m_path.back();
+		m_path.pop_back();
 	}
 }
 

@@ -30,8 +30,14 @@ void FallenStar::Update(float p_delta)
 
 void FallenStar::Draw()
 {
-	m_drawManager->Draw(m_sprite, GetWorldPos().x, GetWorldPos().y, 1);
+	if(m_hidden==false)
+		m_drawManager->Draw(m_sprite, GetWorldPos().x, GetWorldPos().y, 1);
 
+}
+
+void FallenStar::Hide(bool p_val)
+{
+	m_hidden = p_val;
 }
 
 

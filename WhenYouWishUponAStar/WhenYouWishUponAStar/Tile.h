@@ -23,7 +23,6 @@ public:
 	std::vector<Tile*> GetNeighbours();
 	Vector2<int> GetWorldPos();
 	Vector2<int> GetGridPos();
-	void HandleButtonEvent(SDL_MouseButtonEvent& p_mEv);
 	void OnClick(std::string p_selectedSpawnType);
 
 	World* m_world;

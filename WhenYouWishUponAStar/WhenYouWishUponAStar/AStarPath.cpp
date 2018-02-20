@@ -58,6 +58,7 @@ std::vector< Tile* > AStarPath::FindPath(Tile* p_currentTile, Tile* p_targetTile
 
 void AStarPath::Recalculate()
 {
+
 	m_initialized = false;
 }
 
@@ -177,6 +178,7 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 		//move current to closed list
 		m_closedNodes.push_back(m_currentNode);
 		m_openNodes.erase(std::remove(m_openNodes.begin(), m_openNodes.end(), m_currentNode), m_openNodes.end());
+
 		if (m_openNodes.empty() == false) {
 
 			//loop open list, select node with lowest F
@@ -192,9 +194,11 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 			//set current to best node
 			m_currentNode = m_openNodes[nodeIndex];
 
+			//recurse
 			return RecursivePathFinding();
 		}
-		return m_tilesInPath;
+		//no valid path found to target
+		return {};
 	}
 }
 

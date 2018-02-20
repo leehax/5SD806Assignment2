@@ -11,7 +11,7 @@ class FiniteStateMachine;
 class StarChaser;
 class ChaserState :public IState
 {
-
+	
 protected:
 	StarChaser& m_starChaser;
 public:
@@ -19,6 +19,7 @@ public:
 		: m_starChaser(p_chaser)
 	{
 	}
+	virtual void UpdateTarget()=0;
 };
 class State_Collect :public ChaserState
 {
@@ -32,6 +33,7 @@ public:
 	void Enter() override final;
 	void Update(float p_delta) override final;
 	void Exit() override final;
+	void UpdateTarget() override final;
 };
 class State_Sell :public ChaserState
 {
@@ -44,6 +46,7 @@ public:
 	void Enter() override final;
 	void Update(float p_delta) override final;
 	void Exit() override final;
+	void UpdateTarget() override final;
 
 private:
 	float m_energy = 100.f;
@@ -59,6 +62,7 @@ public:
 	void Enter() override final;
 	void Update(float p_delta) override final;
 	void Exit() override final;
+	void UpdateTarget() override final;
 
 private:
 	float m_timeToRest = 1.f;
@@ -73,9 +77,10 @@ public:
 	void Draw() override;
 	void SetTargetTile(const std::string p_targetEntitityType);
 	bool AtTargetTile();
-	void SetHasStar(bool p_hasStar);
-	bool HasStar();
+	void Notify(const std::string p_msg);
 	void RecalculatePath();
+	void MoveToNextTile();
+
 private:
 
 	Tile* m_targetTile = nullptr;
@@ -83,8 +88,9 @@ private:
 	World* m_world;
 	Sprite* m_spriteWithStar;
 	Sprite* m_spriteWithoutStar;
+	Sprite* m_spriteResting;
 	bool m_hasStar;
 	std::vector< Tile* > m_path;
-
+	float m_actTimer = 1.f;
 };
 

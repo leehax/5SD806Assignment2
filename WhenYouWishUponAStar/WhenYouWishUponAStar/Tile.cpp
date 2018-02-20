@@ -68,7 +68,6 @@ void Tile::Draw(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 	if(m_blocked)
 	{
 		m_drawManager->Draw(m_sprites[3], m_x, m_y, 1);
-		m_drawManager->DrawRect(m_rect, 255, 0, 0, 255);
 	}
 
 }
@@ -150,35 +149,7 @@ Vector2<int> Tile::GetGridPos()
 	return Vector2<int>();
 }
 
-void Tile::HandleButtonEvent(SDL_MouseButtonEvent& p_mEv)
-{
-	if(p_mEv.type==SDL_MOUSEBUTTONDOWN)
-	{
-		if (p_mEv.button == SDL_BUTTON_LEFT)
-		{
-			if (m_type == dirt)
-			{
-				m_type = grass;
-				m_activeSprite = m_sprites[1];
-				m_blocked = false;
-			}
-			else if (m_type == grass)
-			{
-				m_type = crater;
-				m_activeSprite = m_sprites[2];
-				m_blocked = true;
-			}
-			else if (m_type == crater)
-			{
-				m_type = dirt;
-				m_activeSprite = m_sprites[0];
-				m_blocked = false;
-			}
-			
-		}
-		
-	}
-}
+
 
 void Tile::OnClick(std::string p_selectedSpawnType)
 {

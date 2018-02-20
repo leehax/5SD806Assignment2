@@ -8,7 +8,7 @@ TradingPost::TradingPost()
 {
 	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
-	m_sprite = m_spriteManager->CreateSprite("../External/textures/TradingPost.png", 0, 0, 32, 32);
+	m_sprite = m_spriteManager->CreateSprite("../External/textures/Trader.png", 0, 0, 32, 32);
 	m_type = "TrPost";
 }
 
