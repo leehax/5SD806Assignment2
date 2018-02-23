@@ -1,11 +1,12 @@
 #pragma once
 #include <memory>
+#include "Math.h"
 class Tile;
-class AStarNode
+class PathFindNode
 {
 public:
-	AStarNode(Tile* p_tile);
-	~AStarNode();
+	PathFindNode(Tile* p_tile);
+	~PathFindNode();
 
 	int GetFCost();
 	int m_gCost = 0; //travel/accumulated cost
@@ -13,8 +14,9 @@ public:
 	int TypeModifier();
 
 	Tile* m_tile = nullptr;
-	AStarNode* m_parentNode= nullptr;
+	PathFindNode* m_parentNode= nullptr;
 
+	Vector2<int> GetGridPos();
 	bool m_blocked(); //get m_tile blocked
 };
 

@@ -1,11 +1,8 @@
 #pragma once
 #include <vector>
-#include <memory>
-#include "Math.h"
-#include "Config.h"
 #include <map>
 class Tile;
-class AStarNode;
+class PathFindNode;
 class World;
 class DrawManager;
 class AStarPath
@@ -14,7 +11,7 @@ public:
 	AStarPath(World* p_world);
 	~AStarPath();
 	
-	std::vector< Tile* > FindPath(Tile* p_currentTile, Tile* p_targetTile); //Test with returning a vector of nodes, and having the agent construct the vector of tiles from that data
+	std::vector< Tile* > FindPath(Tile* p_currentTile, Tile* p_targetTile); //this could be refactored to return a vector of nodes, in which case the pahtfining agent would use the nodes to build the vector of tiles
 	void Recalculate();
 	void Draw();
 
@@ -23,18 +20,18 @@ private:
 	bool m_initialized;
 	void Initialize(Tile* p_currentTile, Tile* p_targetTile);
 
-	std::vector< Tile* > RecursivePathFinding();
+	std::vector< Tile* > RecursivePathFinding(); 
 	std::vector< Tile* > m_tilesInPath;
 
-	AStarNode* m_startingNode;
-	AStarNode* m_currentNode;
-	AStarNode* m_goalNode;
+	PathFindNode* m_startingNode;
+	PathFindNode* m_currentNode;
+	PathFindNode* m_goalNode;
 
-	std::map<std::pair<int, int>, AStarNode*> m_nodes;
-	std::vector < AStarNode*> m_openNodes; 
-	std::vector < AStarNode*> m_closedNodes;
-	std::vector < AStarNode*> m_nodesInPath;
-	std::vector < AStarNode*> AdjacentNodes(AStarNode* p_cur);
+	std::map<std::pair<int, int>, PathFindNode*> m_nodes;
+	std::vector < PathFindNode*> m_openNodes; 
+	std::vector < PathFindNode*> m_closedNodes;
+	std::vector < PathFindNode*> m_nodesInPath;
+	std::vector < PathFindNode*> AdjacentNodes(PathFindNode* p_cur);
 	
 	DrawManager* m_drawManager;
 

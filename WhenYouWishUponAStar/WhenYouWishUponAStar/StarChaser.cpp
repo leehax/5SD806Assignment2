@@ -138,7 +138,7 @@ void State_Rest::UpdateTarget()
 	m_starChaser.SetTargetTile("Ship");
 }
 
-StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new AStarPath(p_world))
+StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new JPSPath(p_world))
 {
 	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
 	m_drawManager = ServiceLocator<DrawManager>::GetService();

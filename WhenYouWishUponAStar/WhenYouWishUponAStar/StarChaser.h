@@ -4,7 +4,7 @@
 #include "IState.h"
 #include "FiniteStateMachine.h"
 #include "AStarPath.h"
-
+#include "JPSPath.h"
 class FallenStar;
 class World;
 class FiniteStateMachine;
@@ -84,7 +84,8 @@ public:
 private:
 
 	Tile* m_targetTile = nullptr;
-	AStarPath* m_pathFinding;
+	//AStarPath* m_pathFinding;
+	JPSPath* m_pathFinding;
 	World* m_world;
 	Sprite* m_spriteWithStar;
 	Sprite* m_spriteWithoutStar;

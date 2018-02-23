@@ -150,7 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AStarNode.h" />
+    <ClInclude Include="PathFindNode.h" />
     <ClInclude Include="AStarPath.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="DrawManager.h" />
@@ -161,6 +161,7 @@
     <ClInclude Include="IEntity.h" />
     <ClInclude Include="IGridMap.h" />
     <ClInclude Include="IState.h" />
+    <ClInclude Include="JPSPath.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="ServiceLocator.h" />
     <ClInclude Include="Spaceship.h" />
@@ -174,7 +175,7 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AStarNode.cpp" />
+    <ClCompile Include="PathFindNode.cpp" />
     <ClCompile Include="AStarPath.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="FiniteStateMachine.cpp" />
     <ClCompile Include="GuiButton.cpp" />
     <ClCompile Include="IEntity.cpp" />
+    <ClCompile Include="JPSPath.cpp" />
     <ClCompile Include="Spaceship.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteManager.cpp" />

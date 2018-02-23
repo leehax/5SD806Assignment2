@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "AStarPath.h"
-#include "AStarNode.h"
+#include "PathFindNode.h"
 #include "Tile.h"
 #include "World.h"
 #include "ServiceLocator.h"
@@ -14,7 +14,7 @@ AStarPath::AStarPath(World* p_world)
 	//Create a node at each tile in the world
 	for(auto t: p_world->GetTiles())
 	{
-		m_nodes.insert(std::pair<std::pair<int,int>,AStarNode*>(t.first, new AStarNode(t.second)));
+		m_nodes.insert(std::pair<std::pair<int,int>,PathFindNode*>(t.first, new PathFindNode(t.second)));
 	}
 
 	m_initialized = false;
@@ -133,9 +133,11 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 
 	if (m_currentNode == m_goalNode)
 	{
-		//build and return path
+		//set the current node's parent to the goal's parent for readability in the following for loop
 		m_goalNode->m_parentNode = m_currentNode->m_parentNode;
-		for(AStarNode * path = m_goalNode; path!=nullptr; path=path->m_parentNode)
+
+		//build and return path
+		for(PathFindNode * path = m_goalNode; path!=nullptr; path=path->m_parentNode)
 		{
 			m_nodesInPath.push_back(path);
 			m_tilesInPath.push_back(path->m_tile);
@@ -202,9 +204,9 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 	}
 }
 
-std::vector<AStarNode*> AStarPath::AdjacentNodes(AStarNode* p_cur)
+std::vector<PathFindNode*> AStarPath::AdjacentNodes(PathFindNode* p_cur)
 {
-	std::vector<AStarNode*> adjacentNodes;
+	std::vector<PathFindNode*> adjacentNodes;
 
 	//Orthogonally adjacent
 	if(p_cur->m_tile->GetGridPos().x> 0)
