@@ -23,108 +23,13 @@ AStarPath::AStarPath(World* p_world)
 
 AStarPath::~AStarPath()
 {
-	for (unsigned int i = 0; i<m_openNodes.size(); i++)
-	{
-		delete m_openNodes[i];
-		m_openNodes[i] = nullptr;
-	}
+	m_nodes.clear();
 	m_openNodes.clear();
-
-	for (unsigned int i = 0; i<m_closedNodes.size(); i++)
-	{
-		delete m_closedNodes[i];
-		m_closedNodes[i] = nullptr;
-	}
 	m_closedNodes.clear();
-	for (unsigned int i = 0; i < m_tilesInPath.size(); i++)
-	{
-		delete m_tilesInPath[i];
-		m_tilesInPath[i] = nullptr;
-	}
 	m_tilesInPath.clear();
-}
-
-std::vector< Tile* > AStarPath::FindPath(Tile* p_currentTile, Tile* p_targetTile)
-{
-	if(!m_initialized)
-	{
-		Initialize(p_currentTile, p_targetTile);
-		m_currentNode = m_startingNode;
-	}
-	
-	return RecursivePathFinding();
-
-}
-
-void AStarPath::Recalculate()
-{
-
-	m_initialized = false;
-}
-
-void AStarPath::Draw()
-{
-	if (m_initialized) {
-
-		for (auto c : m_closedNodes) {
-			m_drawManager->DrawRect(*c->m_tile->GetRect(), 255, 0, 0, 255);
-
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x,c->m_tile->GetWorldPos().y, 12, std::to_string(c->GetFCost()), SDL_Color{ 255,255,255,255 });
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x + 16, c->m_tile->GetWorldPos().y, 12, std::to_string(c->m_gCost), SDL_Color{ 0,255,0,255 });
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x, c->m_tile->GetWorldPos().y + 16, 12, std::to_string(c->m_hCost), SDL_Color{ 255,255,0,255 });
-
-		}
-		for (auto o : m_openNodes) {
-			m_drawManager->DrawRect(*o->m_tile->GetRect(), 0, 255, 0, 255);
-
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x, o->m_tile->GetWorldPos().y, 12, std::to_string(o->GetFCost()), SDL_Color{ 255,255,255,255 });
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x+16, o->m_tile->GetWorldPos().y, 12, std::to_string(o->m_gCost), SDL_Color{ 0,255,0,255 });
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x , o->m_tile->GetWorldPos().y+16, 12, std::to_string(o->m_hCost), SDL_Color{ 255,255,0,255 });
-
-		}
-
-		for (auto n : m_nodesInPath)
-		{
-			if (n->m_parentNode) {
-				m_drawManager->DrawLine(n->m_tile->GetWorldPos().x + Config::HALF_TILE, n->m_tile->GetWorldPos().y + Config::HALF_TILE, n->m_parentNode->m_tile->GetWorldPos().x + Config::HALF_TILE, n->m_parentNode->m_tile->GetWorldPos().y + Config::HALF_TILE, 0, 255, 255, 255);
-			}
-		}
-		m_drawManager->DrawRect(*m_currentNode->m_tile->GetRect(), 255, 255, 0, 255);
-	}
-}
-
-void AStarPath::Initialize(Tile* p_currentTile, Tile* p_targetTile)
-{
-	//clear vectors
-	m_openNodes.clear();
-
-	m_closedNodes.clear();
-
-	m_tilesInPath.clear();
-
-	m_nodesInPath.clear();
-	
-
-	//set starting and goal nodes by comparing the tiles
-	for(auto n:m_nodes)
-	{
-		if (n.second->m_tile == p_currentTile)
-		{
-			m_startingNode = n.second;
-		}
-		if(n.second->m_tile==p_targetTile)
-		{
-			m_goalNode = n.second;
-		}
-	}
-	
-	m_startingNode->m_gCost = 0;
-	m_startingNode->m_hCost = Manhattan(m_startingNode->m_tile->GetGridPos(), m_goalNode->m_tile->GetGridPos());
-	m_startingNode->m_parentNode = nullptr;
-
-	m_openNodes.push_back(m_startingNode);
-
-	m_initialized = true;
+	m_goalNode = nullptr;
+	m_startingNode = nullptr;
+	m_goalNode = nullptr;
 }
 
 
@@ -154,10 +59,8 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 		for (auto a: AdjacentNodes(m_currentNode))
 		{
 			
-			if (std::find(m_openNodes.begin(), m_openNodes.end(), a) != m_openNodes.end() || std::find(m_closedNodes.begin(), m_closedNodes.end(), a) != m_closedNodes.end()) {
-				//ignore nodes already in the closed and open lists
-			}
-			else if (a->m_tile->IsBlocked() == false)
+			bool nodeInOpenOrClosedList = std::find(m_openNodes.begin(), m_openNodes.end(), a) != m_openNodes.end() || std::find(m_closedNodes.begin(), m_closedNodes.end(), a) != m_closedNodes.end();
+			if (a->m_tile->IsBlocked() == false && !nodeInOpenOrClosedList)
 			{
 
 				a->m_parentNode = m_currentNode;
@@ -186,9 +89,9 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 			//loop open list, select node with lowest F
 			for (unsigned int i = 0; i < m_openNodes.size(); i++)
 			{
-				if (m_openNodes[i]->GetFCost() < lowestF)
+				if (m_openNodes[i]->GetFCost(true) < lowestF)
 				{
-					lowestF = m_openNodes[i]->GetFCost();
+					lowestF = m_openNodes[i]->GetFCost(true);
 					nodeIndex = i;
 				}
 			}

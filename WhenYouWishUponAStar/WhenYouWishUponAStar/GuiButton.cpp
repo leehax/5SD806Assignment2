@@ -4,6 +4,7 @@
 #include "ServiceLocator.h"
 #include "Sprite.h"
 #include "SpriteManager.h"
+#include "Config.h"
 
 
 GuiButton::GuiButton(int p_x, int p_y, std::string p_name, std::string p_spriteFilePath)
@@ -19,10 +20,24 @@ GuiButton::GuiButton(int p_x, int p_y, std::string p_name, std::string p_spriteF
 		height = m_sprite->GetClip().h;
 	}
 	m_rect = { p_x,p_y, width, height};
-	
-	std::string p_type;
+
 	m_color1 = { 0,255,255,255};
 	m_color2 = { 255,255,255,255 };
+	m_textHeightOffset = m_rect.h;
+}
+
+GuiButton::GuiButton(int p_x, int p_y, std::string p_name)
+{
+	m_drawManager = ServiceLocator<DrawManager>::GetService();
+	m_name = p_name;
+	m_sprite = nullptr;
+	m_spriteManager = nullptr;
+	int width = Config::TILE_SIZE;
+	int height = Config::TILE_SIZE;
+	m_rect = { p_x,p_y, width, height };
+	m_color1 = { 0,255,255,255 };
+	m_color2 = { 255,255,255,255 };
+	m_textHeightOffset = Config::HALF_TILE;
 }
 
 GuiButton::~GuiButton()
@@ -34,10 +49,11 @@ GuiButton::~GuiButton()
 
 void GuiButton::Draw()
 {
-	
-	m_drawManager->Draw(m_sprite, m_rect.x, m_rect.y, 1);
+	if (m_sprite) {
+		m_drawManager->Draw(m_sprite, m_rect.x, m_rect.y, 1);
+	}
 	m_drawManager->DrawRect(m_rect, m_activeColor.r, m_activeColor.g, m_activeColor.b, m_activeColor.a);
-	m_drawManager->DrawText(m_rect.x, m_rect.y+m_rect.h, 12, m_name, m_activeColor);
+	m_drawManager->DrawText(m_rect.x, m_rect.y+m_textHeightOffset, 12, m_name, m_activeColor);
 
 }
 

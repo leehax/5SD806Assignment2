@@ -12,9 +12,12 @@ PathFindNode::~PathFindNode()
 {
 }
 
-int PathFindNode::GetFCost()
+int PathFindNode::GetFCost(bool p_considerTerrain)
 {
-	return m_gCost + m_hCost + TypeModifier();
+	if (p_considerTerrain) {
+		return m_gCost + m_hCost + TypeModifier();
+	}
+	return m_gCost + m_hCost;
 }
 
 int PathFindNode::TypeModifier()

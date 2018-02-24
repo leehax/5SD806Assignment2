@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="PathFindingAlgorithm.h" />
     <ClInclude Include="PathFindNode.h" />
     <ClInclude Include="AStarPath.h" />
     <ClInclude Include="Config.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PathFindingAlgorithm.cpp" />
     <ClCompile Include="PathFindNode.cpp" />
     <ClCompile Include="AStarPath.cpp" />
     <ClCompile Include="DrawManager.cpp" />

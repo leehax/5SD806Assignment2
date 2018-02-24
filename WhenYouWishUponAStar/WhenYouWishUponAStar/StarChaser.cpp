@@ -7,7 +7,7 @@
 #include "World.h"
 #include "FiniteStateMachine.h"
 #include <iostream>
-
+#include <algorithm>
 
 
 void State_Collect::Enter()
@@ -138,7 +138,7 @@ void State_Rest::UpdateTarget()
 	m_starChaser.SetTargetTile("Ship");
 }
 
-StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new JPSPath(p_world))
+StarChaser::StarChaser(World* p_world) : m_world(p_world), m_JPS(new JPSPath(p_world)), m_AStar(new AStarPath(p_world))
 {
 	m_spriteManager = ServiceLocator<SpriteManager>::GetService();
 	m_drawManager = ServiceLocator<DrawManager>::GetService();
@@ -152,13 +152,13 @@ StarChaser::StarChaser(World* p_world) : m_world(p_world), m_pathFinding(new JPS
 	AddState("Sell", new State_Sell(*this));
 	AddState("Rest", new State_Rest(*this));
 
-	
+	//m_pathFinding = m_AStar;
 }
 
 
 StarChaser::~StarChaser()
 {
-	Destroy();
+	
 	delete m_spriteWithStar;
 	m_spriteWithStar = nullptr;
 	delete m_spriteWithoutStar;
@@ -168,12 +168,10 @@ StarChaser::~StarChaser()
 
 	m_sprite = nullptr;
 
-	delete m_spriteManager;
 	m_spriteManager = nullptr;
 
-	delete m_drawManager;
 	m_drawManager = nullptr;
-
+	Destroy();
 
 }
 
@@ -236,19 +234,44 @@ void StarChaser::Notify(const std::string p_msg)
 
 void StarChaser::RecalculatePath()
 {
-	ChaserState* state = static_cast<ChaserState*>(m_activeState);
-	state->UpdateTarget();
-	m_pathFinding->Recalculate();
-	if (m_targetTile) {
-		m_path = m_pathFinding->FindPath(GetCurrentTile(), m_targetTile);
+	if (m_pathFinding) {
+		ChaserState* state = static_cast<ChaserState*>(m_activeState);
+		state->UpdateTarget();
+
+		m_pathFinding->Recalculate();
+		if (m_targetTile) {
+			m_path = m_pathFinding->FindPath(GetCurrentTile(), m_targetTile);
+		}
 	}
 }
 
 void StarChaser::MoveToNextTile()
 {
 	if (m_path.empty() == false) {
-		m_curTile = m_path.back();
-		m_path.pop_back();
+		if(m_curTile!=m_path.back())
+		{
+			Vector2<int> direction; //normalize the x and y component individually, instead of normalizing the entire vector, to ensure proper movement
+			direction.x = (m_path.back()->GetGridPos().x- m_curTile->GetGridPos().x) / std::max(std::abs(m_path.back()->GetGridPos().x - m_curTile->GetGridPos().x), 1);
+			direction.y = (m_path.back()->GetGridPos().y - m_curTile->GetGridPos().y) / std::max(std::abs(m_path.back()->GetGridPos().y - m_curTile->GetGridPos().y), 1);
+			m_curTile = m_world->GetTile(m_curTile->GetGridPos() + direction);
+		}
+		else {
+			m_path.pop_back();
+		}
+	}
+}
+
+void StarChaser::TogglePathFindingAlgorithm(const std::string p_name)
+{
+	if(p_name=="A*")
+	{
+		m_pathFinding = m_AStar;
+		RecalculatePath();
+	}
+	else if(p_name=="JPS")
+	{
+		m_pathFinding = m_JPS;
+		RecalculatePath();
 	}
 }
 

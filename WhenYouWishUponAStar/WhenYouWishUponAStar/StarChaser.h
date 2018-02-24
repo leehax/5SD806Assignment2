@@ -80,12 +80,15 @@ public:
 	void Notify(const std::string p_msg);
 	void RecalculatePath();
 	void MoveToNextTile();
+	void TogglePathFindingAlgorithm(const std::string p_name);
 
 private:
 
 	Tile* m_targetTile = nullptr;
-	//AStarPath* m_pathFinding;
-	JPSPath* m_pathFinding;
+	AStarPath* m_AStar;
+	JPSPath* m_JPS;
+	PathFindingAlgorithm* m_pathFinding;
+
 	World* m_world;
 	Sprite* m_spriteWithStar;
 	Sprite* m_spriteWithoutStar;
@@ -93,5 +96,7 @@ private:
 	bool m_hasStar;
 	std::vector< Tile* > m_path;
 	float m_actTimer = 1.f;
+
+	Vector2<int> m_currentPos;
 };
 

@@ -8,7 +8,7 @@ public:
 	PathFindNode(Tile* p_tile);
 	~PathFindNode();
 
-	int GetFCost();
+	int GetFCost(bool p_considerTerrain);
 	int m_gCost = 0; //travel/accumulated cost
 	int m_hCost = 0; //heuristic cost
 	int TypeModifier();

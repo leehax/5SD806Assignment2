@@ -6,6 +6,8 @@
 #include "PathFindNode.h"
 #include "Config.h"
 #include "Tile.h"
+#include <algorithm>
+
 JPSPath::JPSPath(World* p_world)
 {
 
@@ -22,207 +24,293 @@ JPSPath::JPSPath(World* p_world)
 
 JPSPath::~JPSPath()
 {
-}
-
-std::vector<Tile*> JPSPath::FindPath(Tile* p_currentTile, Tile* p_targetTile)
-{
-	if (!m_initialized)
+	for (unsigned int i = 0; i<m_openNodes.size(); i++)
 	{
-		Initialize(p_currentTile, p_targetTile);
-		m_currentNode = m_startingNode;
+		delete m_openNodes[i];
+		m_openNodes[i] = nullptr;
 	}
-
-	return RecursivePathFinding();
-}
-
-void JPSPath::Recalculate()
-{
-	m_initialized = false;
-}
-
-void JPSPath::Draw()
-{
-	if (m_initialized) {
-
-		for (auto c : m_closedNodes) {
-			m_drawManager->DrawRect(*c->m_tile->GetRect(), 255, 0, 0, 255);
-
-		}
-		for (auto o : m_openNodes) {
-			m_drawManager->DrawRect(*o->m_tile->GetRect(), 0, 255, 0, 255);
-		}
-
-		for (auto n : m_nodesInPath)
-		{
-			if (n->m_parentNode) {
-				m_drawManager->DrawLine(n->m_tile->GetWorldPos().x + Config::HALF_TILE, n->m_tile->GetWorldPos().y + Config::HALF_TILE, n->m_parentNode->m_tile->GetWorldPos().x + Config::HALF_TILE, n->m_parentNode->m_tile->GetWorldPos().y + Config::HALF_TILE, 0, 255, 255, 255);
-			}
-		}
-		m_drawManager->DrawRect(*m_currentNode->m_tile->GetRect(), 255, 255, 0, 255);
-	}
-}
-
-void JPSPath::Initialize(Tile* p_currentTile, Tile* p_targetTile)
-{
-	//clear vectors
 	m_openNodes.clear();
 
-	m_closedNodes.clear();
-
-	m_tilesInPath.clear();
-
-	m_nodesInPath.clear();
-
-
-	//set starting and goal nodes by comparing the tiles
-	for (auto n : m_nodes)
+	for (unsigned int i = 0; i<m_closedNodes.size(); i++)
 	{
-		if (n.second->m_tile == p_currentTile)
-		{
-			m_startingNode = n.second;
-		}
-		if (n.second->m_tile == p_targetTile)
-		{
-			m_goalNode = n.second;
-		}
+		delete m_closedNodes[i];
+		m_closedNodes[i] = nullptr;
 	}
-
-	m_startingNode->m_gCost = 0;
-	m_startingNode->m_hCost = Manhattan(m_startingNode->m_tile->GetGridPos(), m_goalNode->m_tile->GetGridPos());
-	m_startingNode->m_parentNode = nullptr;
-
-	m_openNodes.push_back(m_startingNode);
-
-	m_initialized = true;
+	m_closedNodes.clear();
+	for (unsigned int i = 0; i < m_tilesInPath.size(); i++)
+	{
+		delete m_tilesInPath[i];
+		m_tilesInPath[i] = nullptr;
+	}
+	m_tilesInPath.clear();
 }
 
-PathFindNode* JPSPath::ExpandNode(PathFindNode* p_cur, Vector2<int> p_direction)
+
+void JPSPath::FindSuccessors(PathFindNode* p_node)
 {
-	
 
-	PathFindNode* nextNode = GetNodeAt(p_cur->GetGridPos() + p_direction);
+	for(auto a: AdjacentNodes(p_node))
+	{
+		PathFindNode* successor = Jump(a, p_node);
+		if(successor)
+		{
+			
+			if(std::find(m_closedNodes.begin(),m_closedNodes.end(),successor) != m_closedNodes.end())
+			{
+					continue;
+			}
+			bool inOpenList = std::find(m_openNodes.begin(), m_openNodes.end(), successor) != m_openNodes.end();
 
-	if (nextNode == nullptr)
+			if( !inOpenList)
+			{
+				successor->m_gCost = p_node->m_gCost + Manhattan(p_node->GetGridPos(), successor->GetGridPos());
+				successor->m_hCost = Manhattan(successor->GetGridPos(), m_goalNode->GetGridPos());
+				successor->m_parentNode = p_node;
+				m_openNodes.push_back(successor);
+			}
+		}
+	}
+}
+
+PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
+{
+	if(p_cur==nullptr)
 	{
 		return nullptr;
 	}
+	int x = p_cur->GetGridPos().x;
+	int y = p_cur->GetGridPos().y;
 
-	//m_openNodes.push_back(nextNode);
-	if (nextNode == m_goalNode)
+	Vector2<int> direction = p_cur->GetGridPos() - p_parent->GetGridPos();
+
+	if (BlockedNodeAt(x,y))
 	{
-		return nextNode;
+		return nullptr;
 	}
-	if(HasForcedNeighbours(nextNode))
+	if (p_cur == m_goalNode)
 	{
-		return nextNode;
+		return p_cur;
 	}
+
 		
-	if (p_direction.x != 0 && p_direction.y != 0) {
+	if (direction.x != 0 && direction.y != 0) {
 
-		Vector2<int> verticalDirection = Vector2<int>(0, p_direction.y);
-		Vector2<int> horizontalDirection = Vector2<int>(p_direction.x, 0);
-		std::vector<Vector2<int>> directions;
-		directions.push_back(verticalDirection);
-		directions.push_back(horizontalDirection);
-
-		for (int i = 0; i < directions.size(); i++)
+		if(  !BlockedNodeAt(x - direction.x, y + direction.y) && BlockedNodeAt(x - direction.x, y)
+			|| !BlockedNodeAt(x + direction.x, y - direction.y) && BlockedNodeAt(x, y - direction.y))
 		{
-			if (ExpandNode(nextNode, directions[i]) != nullptr)
-			{
-				return nextNode;
-			}
+			return p_cur;
+		}
+
+		if(Jump(GetNodeAt(x + direction.x, y), p_cur) || Jump(GetNodeAt(x, y+direction.y), p_cur))
+		{
+			return p_cur;
 		}
 
 	}
-	return ExpandNode(nextNode, p_direction);
+	else
+	{
+		if (direction.x == 0) 
+		{
+			if (!BlockedNodeAt(x + 1, y + direction.y) && BlockedNodeAt(x + 1, y)
+				|| !BlockedNodeAt(x - 1, y + direction.y) && BlockedNodeAt(x - 1, y))
+			{
+				return p_cur;
+			}
+		}
+		else
+		{
+			if (!BlockedNodeAt(x + direction.x, y + 1) && BlockedNodeAt(x, y + 1)
+				|| !BlockedNodeAt(x + direction.x, y - 1) && BlockedNodeAt(x, y - 1))
+			{
+				return p_cur;
+			}
+		}
+		
+	}
 
+
+	return Jump(GetNodeAt(p_cur->GetGridPos() + direction), p_cur);
+	
+	
 }
 
 
 std::vector<Tile*> JPSPath::RecursivePathFinding()
 {
 	//expand adjacent nodes
-	for(auto a: AdjacentNodes(m_currentNode,true))
+	if(m_currentNode==m_goalNode)
 	{
-		PathFindNode* successor=ExpandNode(a,  a->GetGridPos()- m_currentNode->GetGridPos());
-		if (successor) {
-			m_openNodes.push_back(successor);
+
+		//set the current node's parent to the goal's parent for readability in the following for loop
+		m_goalNode->m_parentNode = m_currentNode->m_parentNode;
+
+		//build and return path
+		for (PathFindNode * path = m_goalNode; path != nullptr; path = path->m_parentNode)
+		{
+			m_nodesInPath.push_back(path);
+			m_tilesInPath.push_back(path->m_tile);
 		}
+		return m_tilesInPath;
 	}
-	
-	
-	//if expansion finds a forced neighbor, add the node to the open list
-	//recurse from nodes in open list
+	else {
 
+		FindSuccessors(m_currentNode);
 
-	//return path
+		int lowestF = 99999;
+		int nodeIndex = -1;
+
+		m_closedNodes.push_back(m_currentNode);
+		m_openNodes.erase(std::remove(m_openNodes.begin(), m_openNodes.end(), m_currentNode), m_openNodes.end());
+
+		if (m_openNodes.empty() == false) {
+
+			//loop open list, select node with lowest F
+			for (unsigned int i = 0; i < m_openNodes.size(); i++)
+			{
+				if (m_openNodes[i]->GetFCost(false) < lowestF)
+				{
+					lowestF = m_openNodes[i]->GetFCost(false);
+					nodeIndex = i;
+				}
+			}
+
+			//set current to best node
+			m_currentNode = m_openNodes[nodeIndex];
+
+			//recurse
+			return RecursivePathFinding();
+		}
+
+		
+	}
 	return {};
 }
 
-bool JPSPath::HasForcedNeighbours(PathFindNode* p_node)
-{
-	for(auto a: AdjacentNodes(p_node, false))
-	{
-		if(a->m_blocked())
-		{
-			//forced neighbor at p_cur.pos +direction + a.pos
-			return true;
-		}
-	}
-	return false;
-}
 
-PathFindNode* JPSPath::GetNodeAt(Vector2<int> p_gridPos)
-{
-	
-		if (p_gridPos.x<0 || p_gridPos.x>Config::COLUMNS - 1 || p_gridPos.y<0 || p_gridPos.y>Config::ROWS - 1)
-		{
-			return nullptr;
-		}
-		return	m_nodes[std::make_pair(p_gridPos.x, p_gridPos.y)];
-	
-}
-
-std::vector<PathFindNode*> JPSPath::AdjacentNodes(PathFindNode* p_cur, bool p_considerDiagonallyAdjacent)
+std::vector<PathFindNode*> JPSPath::AdjacentNodes(PathFindNode* p_node)
 {
 	std::vector<PathFindNode*> adjacentNodes;
 
-	//Orthogonally adjacent
-	if(p_cur->m_tile->GetGridPos().x> 0)
+	int x = p_node->GetGridPos().x;
+	int y = p_node->GetGridPos().y;
+	
+	if(p_node->m_parentNode) //the node has a parent, we only return the relevant neighbors in the direction
 	{
-		adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x - 1, p_cur->m_tile->GetGridPos().y)]);
+		Vector2<int> direction; //set the x and y components to be at max a value of 1, as the parent doesnt have to be adjacent
+		direction.x = (x - p_node->m_parentNode->GetGridPos().x) / std::max(std::abs(x - p_node->m_parentNode->GetGridPos().x), 1);
+		direction.y = (y - p_node->m_parentNode->GetGridPos().y) / std::max(std::abs(y - p_node->m_parentNode->GetGridPos().y), 1);
+
+		if(direction.x != 0 && direction.y != 0) //diagonal
+		{
+			//natural neighbors
+			if ( !BlockedNodeAt(x + direction.x, y))
+			{
+				adjacentNodes.push_back(GetNodeAt(x + direction.x, y));
+			}
+
+			if( !BlockedNodeAt(x, y + direction.y))
+			{
+				adjacentNodes.push_back(GetNodeAt(x, y + direction.y));
+			}
+			if ( !BlockedNodeAt(x + direction.x, y + direction.y))
+			{
+				adjacentNodes.push_back(GetNodeAt(x + direction.x, y + direction.y));
+			}
+
+			//forced neighbors
+			if ( BlockedNodeAt(x - direction.x, y))
+			{
+				adjacentNodes.push_back(GetNodeAt(x - direction.x, y + direction.y));
+			}
+
+			if ( BlockedNodeAt(x, y - direction.y))
+			{
+				adjacentNodes.push_back(GetNodeAt(x + direction.x, y - direction.y));
+			}
+
+		}
+		else //orthogonal
+		{
+			if(direction.x == 0) //vertical
+			{
+				//natural neighbor
+				if( !BlockedNodeAt(x,y+direction.y))
+				{
+					adjacentNodes.push_back(GetNodeAt(x, y + direction.y));
+				}
+
+				//forced neighbors
+				if ( BlockedNodeAt(x + 1, y))
+				{
+					adjacentNodes.push_back(GetNodeAt(x + 1, y + direction.y));
+				}
+				if ( BlockedNodeAt(x - 1, y))
+				{
+					adjacentNodes.push_back(GetNodeAt(x - 1, y + direction.y));
+				}
+
+			}
+			else //horizontal
+			{
+				//natural neighbor
+				if ( !BlockedNodeAt(x + direction.x, y))
+				{
+					adjacentNodes.push_back(GetNodeAt(x + direction.x , y));
+				}
+				
+				//forced neighbors
+				if ( BlockedNodeAt(x, y + 1))
+				{
+					adjacentNodes.push_back(GetNodeAt(x +direction.x, y + 1));
+				}
+				if ( BlockedNodeAt(x, y - 1))
+				{
+					adjacentNodes.push_back(GetNodeAt(x + direction.x, y - 1));
+				}
+			}
+		}
 	}
-	if (p_cur->m_tile->GetGridPos().x< Config::COLUMNS-1)
+
+
+	else //we return all neighbors
 	{
-		adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x + 1, p_cur->m_tile->GetGridPos().y)]);
-	}
-	if (p_cur->m_tile->GetGridPos().y> 0)
-	{
-		adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x , p_cur->m_tile->GetGridPos().y-1)]);
-	}
-	if (p_cur->m_tile->GetGridPos().y< Config::ROWS - 1)
-	{
-		adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x, p_cur->m_tile->GetGridPos().y+1)]);
-	}
-	//Diagonally adjacent
-	if (p_considerDiagonallyAdjacent == true) {
+		//Orthogonal
+		if (x > 0)
+		{
+			adjacentNodes.push_back(GetNodeAt(x - 1, y));
+		}
+		if (x < Config::COLUMNS - 1)
+		{
+			adjacentNodes.push_back(GetNodeAt(x + 1, y));
+		}
+		if (y > 0)
+		{
+			adjacentNodes.push_back(GetNodeAt(x, y - 1));
+		}
+		if (y < Config::ROWS - 1)
+		{
+			adjacentNodes.push_back(GetNodeAt(x, y + 1));
+		}
+
+		//Diagonal
+		if (x > 0 && y > 0)
+		{
+			adjacentNodes.push_back(GetNodeAt(x - 1, y - 1));
+		}
+		if (x > 0 && y < Config::ROWS - 1)
+		{
+			adjacentNodes.push_back(GetNodeAt(x - 1, y + 1));
+		}
+		if (x < Config::COLUMNS - 1 && y> 0)
+		{
+			adjacentNodes.push_back(GetNodeAt(x + 1, y - 1));
+		}
+		if (x < Config::COLUMNS - 1 && y < Config::ROWS - 1)
+		{
+			adjacentNodes.push_back(GetNodeAt(x + 1, y + 1));
+
+		}
 		
-		if (p_cur->m_tile->GetGridPos().x > 0 && p_cur->m_tile->GetGridPos().y > 0)
-		{
-			adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x - 1, p_cur->m_tile->GetGridPos().y - 1)]);
-		}
-		if (p_cur->m_tile->GetGridPos().x > 0 && p_cur->m_tile->GetGridPos().y < Config::ROWS - 1)
-		{
-			adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x - 1, p_cur->m_tile->GetGridPos().y + 1)]);
-		}
-		if (p_cur->m_tile->GetGridPos().x < Config::COLUMNS - 1 && p_cur->m_tile->GetGridPos().y> 0)
-		{
-			adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x + 1, p_cur->m_tile->GetGridPos().y - 1)]);
-		}
-		if (p_cur->m_tile->GetGridPos().x < Config::COLUMNS - 1 && p_cur->m_tile->GetGridPos().y < Config::ROWS - 1)
-		{
-			adjacentNodes.push_back(m_nodes[std::make_pair(p_cur->m_tile->GetGridPos().x + 1, p_cur->m_tile->GetGridPos().y + 1)]);
-		}
 	}
 
 	return adjacentNodes;

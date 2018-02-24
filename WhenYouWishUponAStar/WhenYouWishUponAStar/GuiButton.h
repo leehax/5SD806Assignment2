@@ -11,6 +11,7 @@ class GuiButton
 {
 public:
 	GuiButton(int p_x, int p_y, std::string p_name, std::string p_spriteFilePath);
+	GuiButton(int p_x, int p_y, std::string p_name);
 	~GuiButton();
 	void Draw();
 	void SetActive(bool p_val);
@@ -30,7 +31,7 @@ private:
 	SDL_Color m_color2;
 	SDL_Color m_activeColor;
 	bool m_active;
-
+	int m_textHeightOffset;
 
 };
 

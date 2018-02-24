@@ -61,16 +61,22 @@ void World::Initialise()
 	
 	
 
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 7, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 13, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/Trader.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/Star.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 19, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
-	m_guiButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 22, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE, Config::WINDOW_HEIGHT - 48, "Dirt","../External/textures/Spacedirt.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 4, Config::WINDOW_HEIGHT - 48, "Grass", "../External/textures/SpaceGrass.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 7, Config::WINDOW_HEIGHT - 48, "Crater", "../External/textures/Crater.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 48, "Ship", "../External/textures/Spaceship.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 13, Config::WINDOW_HEIGHT - 48, "TrPost", "../External/textures/Trader.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 16, Config::WINDOW_HEIGHT - 48, "FllnStar", "../External/textures/Star.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 19, Config::WINDOW_HEIGHT - 48, "StarChsr", "../External/textures/StarChaser.png"));
+	m_tileTypeAndEntityButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 22, Config::WINDOW_HEIGHT - 48, "Block", "../External/textures/BlockedTile.png"));
 
-	m_selectedGuiButton = m_guiButtons[0];
+	m_pathFindingAlgorithmButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 10, Config::WINDOW_HEIGHT - 96, "A*"));
+	m_pathFindingAlgorithmButtons.push_back(std::make_shared<GuiButton>(Config::TILE_SIZE * 13, Config::WINDOW_HEIGHT - 96, "JPS"));
+
+
+	m_selectedTileTypeOrEntity = m_tileTypeAndEntityButtons[0];
+	m_selectedPathFindingAlgorithm = m_pathFindingAlgorithmButtons[0];
+	m_starChaser->TogglePathFindingAlgorithm(m_pathFindingAlgorithmButtons[0]->GetName());
 }
 
 void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
@@ -80,9 +86,13 @@ void World::DrawGrid(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a)
 		t.second->Draw(p_r, p_g, p_b, p_a);
 	}
 	
-	for(auto g:m_guiButtons)
+	for(auto g:m_tileTypeAndEntityButtons)
 	{
 		g->Draw();
+	}
+	for(auto p: m_pathFindingAlgorithmButtons)
+	{
+		p->Draw();
 	}
 	m_ship->Draw();
 	m_starChaser->Draw();
@@ -98,15 +108,26 @@ void World::Update(float p_delta)
 		t.second->Update(p_delta);
 
 	}
-	for(auto g:m_guiButtons)
+	for(auto g:m_tileTypeAndEntityButtons)
 	{
-		if(g!=m_selectedGuiButton)
+		if(g!=m_selectedTileTypeOrEntity)
 		{
 			g->SetActive(false);
 		}
-		else if(g==m_selectedGuiButton)
+		else if(g==m_selectedTileTypeOrEntity)
 		{
 			g->SetActive(true);
+		}
+	}
+	for(auto p: m_pathFindingAlgorithmButtons)
+	{
+		if(p!=m_selectedPathFindingAlgorithm)
+		{
+			p->SetActive(false);
+		}
+		else if(p==m_selectedPathFindingAlgorithm)
+		{
+			p->SetActive(true);
 		}
 	}
 
@@ -126,6 +147,15 @@ Tile* World::GetTile(int p_gridX, int p_gridY)
 	return	m_tiles[std::make_pair(p_gridX, p_gridY)];
 }
 
+Tile* World::GetTile(Vector2<int> p_gridPos)
+{
+	if (p_gridPos.x<0 || p_gridPos.x>Config::COLUMNS - 1 || p_gridPos.y<0 || p_gridPos.y>Config::ROWS - 1)
+	{
+		return nullptr;
+	}
+	return	m_tiles[std::make_pair(p_gridPos.x, p_gridPos.y)];
+}
+
 void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 {
 	
@@ -139,78 +169,77 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 			{	
 				
 
-				if (m_selectedGuiButton->GetName() == "Dirt" || m_selectedGuiButton->GetName() == "Grass" ||
-					m_selectedGuiButton->GetName() == "Crater" ) {
-					t.second->OnClick(m_selectedGuiButton->GetName());
+				if (m_selectedTileTypeOrEntity->GetName() == "Dirt" || m_selectedTileTypeOrEntity->GetName() == "Grass" ||
+					m_selectedTileTypeOrEntity->GetName() == "Crater" ) {
+					t.second->OnClick(m_selectedTileTypeOrEntity->GetName());
 				}
-				else if(m_selectedGuiButton->GetName() == "Block")
+				else if(m_selectedTileTypeOrEntity->GetName() == "Block")
 				{
 					if(EntityOnTile(t.second)==false)
 					{
 						t.second->SetBlocked(true);
-					
-					
+						
 					}
 				}
-				else if (m_selectedGuiButton->GetName() == "Ship")
+				else if (m_selectedTileTypeOrEntity->GetName() == "Ship")
 				{
-
 					if (m_ship)
 					{
 						m_ship->SetCurTile(t.second);
 					}
-
-
 				}
-				else if (m_selectedGuiButton->GetName() == "StarChsr")
+				else if (m_selectedTileTypeOrEntity->GetName() == "StarChsr")
 				{
-
 					if (m_starChaser)
 					{
 						m_starChaser->SetCurTile(t.second);
-					
-					
 					}
-
-
 				}
-				else if (m_selectedGuiButton->GetName() == "FllnStar")
+				else if (m_selectedTileTypeOrEntity->GetName() == "FllnStar")
 				{
-
 					if (m_fallenStar)
 					{
 						m_fallenStar->SetCurTile(t.second);
 					}
-
-
 				}
-				else if (m_selectedGuiButton->GetName() == "TrPost")
+				else if (m_selectedTileTypeOrEntity->GetName() == "TrPost")
 				{
-
 					if (m_tradingPost)
 					{
 						m_tradingPost->SetCurTile(t.second);
 					}
-
-
 				}
 				m_starChaser->RecalculatePath();
 			}
 		}
 	}
 
-	for(auto g:m_guiButtons)
+	for(auto g:m_tileTypeAndEntityButtons)
 	{
 		if (SDL_PointInRect(&p_pos, g->GetRect()))
 		{
 			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button==SDL_BUTTON_LEFT)
 			{
-				//g->SetActive(true);
-				m_selectedGuiButton = g;
+				
+				m_selectedTileTypeOrEntity = g;
 				
 		
 			}
 		}
+	}
+	for(auto p: m_pathFindingAlgorithmButtons)
+	{
+		if (SDL_PointInRect(&p_pos, p->GetRect()))
+		{
+			if (p_ev.type == SDL_MOUSEBUTTONDOWN&&p_ev.button.button == SDL_BUTTON_LEFT)
+			{
+				m_starChaser->TogglePathFindingAlgorithm(p->GetName());
+				m_selectedPathFindingAlgorithm = p;
+
+
+			}
+		}
+		
 	}
 	
 }

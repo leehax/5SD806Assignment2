@@ -18,9 +18,7 @@ Spaceship::~Spaceship()
 {
 	delete m_sprite;
 	m_sprite = nullptr;
-	delete m_spriteManager;
 	m_spriteManager = nullptr;
-	delete m_drawManager;
 	m_drawManager = nullptr;
 }
 

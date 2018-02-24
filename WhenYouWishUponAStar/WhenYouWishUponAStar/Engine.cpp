@@ -45,8 +45,10 @@ void Engine::Destroy()
 {
 	delete m_world;
 	m_world = nullptr;
+
 	delete m_spriteManager;
 	m_spriteManager = nullptr;
+
 	m_drawManager->Destroy();
 	delete m_drawManager;
 	m_drawManager = nullptr;
