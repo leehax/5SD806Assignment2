@@ -27,17 +27,11 @@ void PathFindingAlgorithm::Draw()
 		for (auto c : m_closedNodes) {
 			m_drawManager->DrawRect(*c->m_tile->GetRect(), 255, 0, 0, 255);
 
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x,c->m_tile->GetWorldPos().y, 12, std::to_string(c->GetFCost()), SDL_Color{ 255,255,255,255 });
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x + 16, c->m_tile->GetWorldPos().y, 12, std::to_string(c->m_gCost), SDL_Color{ 0,255,0,255 });
-			//	m_drawManager->DrawText(c->m_tile->GetWorldPos().x, c->m_tile->GetWorldPos().y + 16, 12, std::to_string(c->m_hCost), SDL_Color{ 255,255,0,255 });
 
 		}
 		for (auto o : m_openNodes) {
 			m_drawManager->DrawRect(*o->m_tile->GetRect(), 0, 255, 0, 255);
 
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x, o->m_tile->GetWorldPos().y, 12, std::to_string(o->GetFCost()), SDL_Color{ 255,255,255,255 });
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x+16, o->m_tile->GetWorldPos().y, 12, std::to_string(o->m_gCost), SDL_Color{ 0,255,0,255 });
-			//	m_drawManager->DrawText(o->m_tile->GetWorldPos().x , o->m_tile->GetWorldPos().y+16, 12, std::to_string(o->m_hCost), SDL_Color{ 255,255,0,255 });
 
 		}
 
@@ -67,7 +61,7 @@ void PathFindingAlgorithm::Initialize(Tile* p_currentTile, Tile* p_targetTile)
 	m_nodesInPath.clear();
 
 
-	//set starting and goal nodes by comparing the tiles
+	//set starting and goal nodes
 	for (auto n : m_nodes)
 	{
 		if (n.second->m_tile == p_currentTile)

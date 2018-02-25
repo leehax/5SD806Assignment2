@@ -12,7 +12,7 @@ PathFindNode::~PathFindNode()
 {
 }
 
-int PathFindNode::GetFCost(bool p_considerTerrain)
+unsigned int PathFindNode::GetFCost(bool p_considerTerrain)
 {
 	if (p_considerTerrain) {
 		return m_gCost + m_hCost + TypeModifier();
@@ -20,7 +20,7 @@ int PathFindNode::GetFCost(bool p_considerTerrain)
 	return m_gCost + m_hCost;
 }
 
-int PathFindNode::TypeModifier()
+unsigned int PathFindNode::TypeModifier()
 {
 	return m_tile->m_type * 20;
 }

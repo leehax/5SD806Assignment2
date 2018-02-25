@@ -20,11 +20,13 @@ World::World()
 
 World::~World()
 {
+
 	for (auto t : m_tiles) {
 		delete t.second;
 		t.second = nullptr;
 	}
 	m_tiles.clear();
+
 
 }
 
@@ -42,22 +44,40 @@ void World::Initialise()
 		}
 	}
 
-	 
+	Tile* randomTile = GetTile(rand() % m_columns, rand() % m_rows);
+	while (randomTile->IsBlocked())
+	{
+		randomTile = GetTile(rand() % m_columns, rand() % m_rows);
+	}
 
-
-;
 	m_ship = std::make_unique<Spaceship>();
-	m_ship->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	m_ship->SetCurTile(randomTile);
+
+	while (randomTile->IsBlocked() ||EntityOnTile(randomTile)) 
+	{
+		randomTile = GetTile(rand() % m_columns, rand() % m_rows);
+	}
 
 	m_fallenStar = std::make_unique<FallenStar>();
-	m_fallenStar->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	m_fallenStar->SetCurTile(randomTile);
+
+	while (randomTile->IsBlocked() || randomTile == m_ship->GetCurrentTile() || randomTile == m_fallenStar->GetCurrentTile())
+	{
+		randomTile = GetTile(rand() % m_columns, rand() % m_rows);
+	}
 
 	m_tradingPost= std::make_unique<TradingPost>();
-	m_tradingPost->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	m_tradingPost->SetCurTile(randomTile);
 
+	while (randomTile->IsBlocked() || randomTile == m_ship->GetCurrentTile() || randomTile == m_fallenStar->GetCurrentTile() || randomTile==m_tradingPost->GetCurrentTile())
+	{
+		randomTile = GetTile(rand() % m_columns, rand() % m_rows);
+	}
 	m_starChaser = std::make_unique<StarChaser>(this);
-	m_starChaser->SetCurTile(GetTile(rand() % m_columns, rand() % m_rows));
+	m_starChaser->SetCurTile(randomTile);
+	randomTile = nullptr;
 	m_starChaser->SetState("Collect");
+	
 	
 	
 
@@ -185,28 +205,42 @@ void World::HandleEvent(SDL_Event& p_ev, SDL_Point p_pos)
 				{
 					if (m_ship)
 					{
-						m_ship->SetCurTile(t.second);
+						if (!t.second->IsBlocked()) {
+							if (m_starChaser) {
+								if (m_starChaser->GetActiveState() == "Rest" && m_starChaser->GetCurrentTile() == m_ship->GetCurrentTile()) //if the chaser is resting in the ship, move them to the same tile as the ship
+								{
+									m_starChaser->SetCurTile(t.second);
+								}
+							}
+							m_ship->SetCurTile(t.second);
+						}
 					}
 				}
 				else if (m_selectedTileTypeOrEntity->GetName() == "StarChsr")
 				{
 					if (m_starChaser)
 					{
-						m_starChaser->SetCurTile(t.second);
+						if (!t.second->IsBlocked()) {
+							m_starChaser->SetCurTile(t.second);
+						}
 					}
 				}
 				else if (m_selectedTileTypeOrEntity->GetName() == "FllnStar")
 				{
 					if (m_fallenStar)
 					{
-						m_fallenStar->SetCurTile(t.second);
+						if (!t.second->IsBlocked()) {
+							m_fallenStar->SetCurTile(t.second);
+						}
 					}
 				}
 				else if (m_selectedTileTypeOrEntity->GetName() == "TrPost")
 				{
 					if (m_tradingPost)
 					{
-						m_tradingPost->SetCurTile(t.second);
+						if (!t.second->IsBlocked()) {
+							m_tradingPost->SetCurTile(t.second);
+						}
 					}
 				}
 				m_starChaser->RecalculatePath();
@@ -251,7 +285,12 @@ std::map<std::pair<int, int>, Tile*> World::GetTiles()
 
 bool World::EntityOnTile(Tile* p_tile)
 {
-	return m_ship->GetCurrentTile() == p_tile || m_starChaser->GetCurrentTile() == p_tile || m_fallenStar->GetCurrentTile() == p_tile || m_tradingPost->GetCurrentTile() == p_tile;
+	if (m_ship && m_ship->GetCurrentTile() == p_tile) return true;
+	if (m_starChaser && m_starChaser->GetCurrentTile() == p_tile) return true;
+	if (m_fallenStar&&m_fallenStar->GetCurrentTile() == p_tile) return true;
+	if (m_tradingPost && m_tradingPost->GetCurrentTile() == p_tile) return true;
+
+	return false;
 }
 
 Tile* World::GetTileWithEntity(const std::string p_type)

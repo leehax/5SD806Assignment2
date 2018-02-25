@@ -159,17 +159,23 @@ StarChaser::StarChaser(World* p_world) : m_world(p_world), m_JPS(new JPSPath(p_w
 StarChaser::~StarChaser()
 {
 	
-	delete m_spriteWithStar;
-	m_spriteWithStar = nullptr;
-	delete m_spriteWithoutStar;
-	m_spriteWithoutStar = nullptr;
-	delete m_spriteResting;
-	m_spriteWithoutStar = nullptr;
+	delete m_AStar;
+	m_AStar = nullptr;
+	delete m_JPS;
+	m_JPS = nullptr;
 
+	m_pathFinding = nullptr;
+
+	
+	m_spriteManager->DeleteSprite(m_spriteWithStar);
+	m_spriteWithStar = nullptr;
+	m_spriteManager->DeleteSprite(m_spriteWithoutStar);
+	m_spriteWithoutStar = nullptr;
+	m_spriteManager->DeleteSprite(m_spriteResting);
+	m_spriteWithoutStar = nullptr;
 	m_sprite = nullptr;
 
 	m_spriteManager = nullptr;
-
 	m_drawManager = nullptr;
 	Destroy();
 

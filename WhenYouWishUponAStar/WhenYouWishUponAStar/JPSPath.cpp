@@ -24,25 +24,19 @@ JPSPath::JPSPath(World* p_world)
 
 JPSPath::~JPSPath()
 {
-	for (unsigned int i = 0; i<m_openNodes.size(); i++)
+	for (auto m:m_nodes)
 	{
-		delete m_openNodes[i];
-		m_openNodes[i] = nullptr;
+		//m.second->m_tile = nullptr;
+		delete m.second;
+		m.second = nullptr;
 	}
+	m_nodes.clear();
 	m_openNodes.clear();
-
-	for (unsigned int i = 0; i<m_closedNodes.size(); i++)
-	{
-		delete m_closedNodes[i];
-		m_closedNodes[i] = nullptr;
-	}
 	m_closedNodes.clear();
-	for (unsigned int i = 0; i < m_tilesInPath.size(); i++)
-	{
-		delete m_tilesInPath[i];
-		m_tilesInPath[i] = nullptr;
-	}
 	m_tilesInPath.clear();
+
+	m_goalNode = nullptr;
+	m_startingNode = nullptr;
 }
 
 
@@ -78,6 +72,8 @@ PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
 	{
 		return nullptr;
 	}
+
+	//set local variables for readabilty
 	int x = p_cur->GetGridPos().x;
 	int y = p_cur->GetGridPos().y;
 
@@ -87,30 +83,33 @@ PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
 	{
 		return nullptr;
 	}
+
 	if (p_cur == m_goalNode)
 	{
 		return p_cur;
 	}
 
-		
-	if (direction.x != 0 && direction.y != 0) {
+	
+	if (direction.x != 0 && direction.y != 0) { //travelling diagonally
 
+		//check for forced neighbors
 		if(  !BlockedNodeAt(x - direction.x, y + direction.y) && BlockedNodeAt(x - direction.x, y)
 			|| !BlockedNodeAt(x + direction.x, y - direction.y) && BlockedNodeAt(x, y - direction.y))
 		{
 			return p_cur;
 		}
-
+		//if we travel diagonally, we need to Jump in both our X and Y directions
 		if(Jump(GetNodeAt(x + direction.x, y), p_cur) || Jump(GetNodeAt(x, y+direction.y), p_cur))
 		{
 			return p_cur;
 		}
 
 	}
-	else
+	else //travelling orthogonally
 	{
 		if (direction.x == 0) 
 		{
+			//check for forced neighbors
 			if (!BlockedNodeAt(x + 1, y + direction.y) && BlockedNodeAt(x + 1, y)
 				|| !BlockedNodeAt(x - 1, y + direction.y) && BlockedNodeAt(x - 1, y))
 			{
@@ -119,6 +118,7 @@ PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
 		}
 		else
 		{
+			//check for forced neighbors
 			if (!BlockedNodeAt(x + direction.x, y + 1) && BlockedNodeAt(x, y + 1)
 				|| !BlockedNodeAt(x + direction.x, y - 1) && BlockedNodeAt(x, y - 1))
 			{
@@ -128,7 +128,7 @@ PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
 		
 	}
 
-
+	//recurse
 	return Jump(GetNodeAt(p_cur->GetGridPos() + direction), p_cur);
 	
 	
@@ -137,7 +137,6 @@ PathFindNode* JPSPath::Jump(PathFindNode* p_cur, PathFindNode* p_parent)
 
 std::vector<Tile*> JPSPath::RecursivePathFinding()
 {
-	//expand adjacent nodes
 	if(m_currentNode==m_goalNode)
 	{
 
@@ -156,7 +155,7 @@ std::vector<Tile*> JPSPath::RecursivePathFinding()
 
 		FindSuccessors(m_currentNode);
 
-		int lowestF = 99999;
+		unsigned int lowestF = UINT_MAX;
 		int nodeIndex = -1;
 
 		m_closedNodes.push_back(m_currentNode);
@@ -183,6 +182,7 @@ std::vector<Tile*> JPSPath::RecursivePathFinding()
 
 		
 	}
+	//no valid path
 	return {};
 }
 
@@ -191,12 +191,13 @@ std::vector<PathFindNode*> JPSPath::AdjacentNodes(PathFindNode* p_node)
 {
 	std::vector<PathFindNode*> adjacentNodes;
 
+	//set local variables for readabilty
 	int x = p_node->GetGridPos().x;
 	int y = p_node->GetGridPos().y;
 	
-	if(p_node->m_parentNode) //the node has a parent, we only return the relevant neighbors in the direction
+	if(p_node->m_parentNode) //the node has a parent, we only return the relevant neighbors when travelling in the direction from the parent
 	{
-		Vector2<int> direction; //set the x and y components to be at max a value of 1, as the parent doesnt have to be adjacent
+		Vector2<int> direction; //set the x and y components to be at max a value of 1, as the parent doesnt have to be adjacent. If we were to normalize the entire vector, the grid navigation wouldnt work as it requires natural numbers
 		direction.x = (x - p_node->m_parentNode->GetGridPos().x) / std::max(std::abs(x - p_node->m_parentNode->GetGridPos().x), 1);
 		direction.y = (y - p_node->m_parentNode->GetGridPos().y) / std::max(std::abs(y - p_node->m_parentNode->GetGridPos().y), 1);
 

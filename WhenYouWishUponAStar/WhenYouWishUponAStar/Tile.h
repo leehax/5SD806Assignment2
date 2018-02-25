@@ -19,13 +19,10 @@ public:
 	SDL_Rect* GetRect();
 	void Draw(Uint8 p_r, Uint8 p_g, Uint8 p_b, Uint8 p_a);
 	void Update(float p_delta);
-	void FindNeighbours();
-	std::vector<Tile*> GetNeighbours();
 	Vector2<int> GetWorldPos();
 	Vector2<int> GetGridPos();
 	void OnClick(std::string p_selectedSpawnType);
 
-	World* m_world;
 	bool IsBlocked(); 
 	void SetBlocked(bool p_val);
 	Type m_type;
@@ -38,7 +35,6 @@ private:
 	SpriteManager* m_spriteManager;
 	Sprite* m_activeSprite;
 	std::vector<Sprite*> m_sprites;
-	std::vector<Tile*> m_neighbours;
 	unsigned int m_gridX, m_gridY, m_x, m_y;;
 
 

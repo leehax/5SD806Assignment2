@@ -23,7 +23,8 @@ GuiButton::GuiButton(int p_x, int p_y, std::string p_name, std::string p_spriteF
 
 	m_color1 = { 0,255,255,255};
 	m_color2 = { 255,255,255,255 };
-	m_textHeightOffset = m_rect.h;
+	m_textYOffset = m_rect.h;
+	m_textXOffset = 0;
 }
 
 GuiButton::GuiButton(int p_x, int p_y, std::string p_name)
@@ -37,14 +38,21 @@ GuiButton::GuiButton(int p_x, int p_y, std::string p_name)
 	m_rect = { p_x,p_y, width, height };
 	m_color1 = { 0,255,255,255 };
 	m_color2 = { 255,255,255,255 };
-	m_textHeightOffset = Config::HALF_TILE;
+	//center text
+	m_textYOffset = Config::HALF_TILE/2;
+	int textWidth;
+	TTF_SizeText(m_drawManager->GetDefFont(), m_name.c_str(), &textWidth, nullptr);
+	int widthDiff = m_rect.w - textWidth;
+	m_textXOffset = (m_rect.w / textWidth)+(widthDiff/2);
+	
 }
 
 GuiButton::~GuiButton()
 {
-	m_drawManager = nullptr;
+
 	m_sprite = nullptr;
 	m_spriteManager = nullptr;
+	m_drawManager = nullptr;
 }
 
 void GuiButton::Draw()
@@ -53,7 +61,7 @@ void GuiButton::Draw()
 		m_drawManager->Draw(m_sprite, m_rect.x, m_rect.y, 1);
 	}
 	m_drawManager->DrawRect(m_rect, m_activeColor.r, m_activeColor.g, m_activeColor.b, m_activeColor.a);
-	m_drawManager->DrawText(m_rect.x, m_rect.y+m_textHeightOffset, 12, m_name, m_activeColor);
+	m_drawManager->DrawText(m_rect.x+m_textXOffset, m_rect.y+m_textYOffset, m_name, m_activeColor);
 
 }
 

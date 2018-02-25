@@ -31,7 +31,7 @@ private:
 	SDL_Color m_color2;
 	SDL_Color m_activeColor;
 	bool m_active;
-	int m_textHeightOffset;
+	int m_textYOffset, m_textXOffset;
 
 };
 

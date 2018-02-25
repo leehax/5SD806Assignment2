@@ -41,8 +41,8 @@ void Engine::Initialise()
 }
 
 void Engine::Destroy()
-
 {
+
 	delete m_world;
 	m_world = nullptr;
 
@@ -95,21 +95,3 @@ void Engine::HandleEvents()
 	}
 }
 
-
-
-void Engine::LockFrameRate(int p_frameCount)
-{
-	if(m_delta<30)
-	{
-		SDL_Delay(30 - m_delta);
-	}
-	m_frameCount++;
-	if (m_nextTick < SDL_GetTicks())
-	{
-		m_frameCount = p_frameCount / 1.0f;
-		m_frameRate = m_frameCount;
-		std::cout << "FPS: " << m_frameRate << '\n';
-		m_frameCount = 0;
-		m_nextTick = SDL_GetTicks() + 1000;
-	}
-}

@@ -23,13 +23,20 @@ AStarPath::AStarPath(World* p_world)
 
 AStarPath::~AStarPath()
 {
+	for (auto m : m_nodes)
+	{
+		m.second->m_tile = nullptr;
+		delete m.second;
+		m.second = nullptr;
+	}
 	m_nodes.clear();
 	m_openNodes.clear();
 	m_closedNodes.clear();
 	m_tilesInPath.clear();
+
 	m_goalNode = nullptr;
 	m_startingNode = nullptr;
-	m_goalNode = nullptr;
+	
 }
 
 
@@ -52,9 +59,8 @@ std::vector< Tile* > AStarPath::RecursivePathFinding()
 	}
 
 	else {
-		int lowestF = 99999;
+		unsigned int lowestF = UINT_MAX;
 		int nodeIndex = -1;
-
 		//init adjacent node variables and add the nodes to the open list
 		for (auto a: AdjacentNodes(m_currentNode))
 		{

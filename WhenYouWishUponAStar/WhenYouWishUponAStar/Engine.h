@@ -16,7 +16,6 @@ private:
 	void CalculateDelta();
 	void HandleEvents();
 	bool isRunning;
-	void LockFrameRate(int p_frameCount);
 	float m_delta;
 
 	int m_frameCount;

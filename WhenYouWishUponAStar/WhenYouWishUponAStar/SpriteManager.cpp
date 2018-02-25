@@ -9,9 +9,12 @@ SpriteManager::SpriteManager(SDL_Renderer* p_renderer)
 }
 SpriteManager::~SpriteManager()
 {
-	
 	m_sprites.clear();
-
+	for(auto t: m_textures)
+	{
+		SDL_DestroyTexture(t.second);
+		t.second = nullptr;
+	}
 	m_textures.clear();
 }
 
@@ -36,9 +39,10 @@ Sprite* SpriteManager::CreateSprite(const std::string p_file, unsigned int p_x, 
 
 void SpriteManager::DeleteSprite(Sprite* p_sprite)
 {
-	for(auto it=m_sprites.begin();it!=m_sprites.end();)
+	
+	for (auto it = m_sprites.begin(); it != m_sprites.end();)
 	{
-		if(*it == p_sprite)
+		if (*it == p_sprite)
 		{
 			delete *it;
 			it = m_sprites.erase(it);
@@ -48,5 +52,6 @@ void SpriteManager::DeleteSprite(Sprite* p_sprite)
 			it++;
 		}
 	}
+	
 }
 

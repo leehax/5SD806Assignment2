@@ -11,7 +11,7 @@ class IEntity
 {
 public:
 	IEntity();
-	~IEntity();
+	virtual ~IEntity();
 
 	virtual void Update(float p_delta)=0;
 	virtual void Draw()=0;
